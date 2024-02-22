@@ -1,0 +1,30 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "backend source code for skillet",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brendenGit/Skillet.git"
+  },
+  "author": "Brenden Arias",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brendenGit/Skillet/issues"
+  },
+  "homepage": "https://github.com/brendenGit/Skillet#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "colors": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "jsonschema": "^1.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.11.3"
+  }
+}
