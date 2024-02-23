@@ -1,11 +1,12 @@
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
+  username VARCHAR(50) UNIQUE NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULl CHECK (position('@' IN email) > 1),
   password VARCHAR(255) NOT NULL,
   first_name VARCHAR(255) NOT NULL,
   last_name VARCHAR(255) NOT NULL,
-  is_creator BOOLEAN NOT NULL DEFAULT FALSE,
   is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+  is_creator BOOLEAN NOT NULL DEFAULT FALSE,
   creator_description TEXT
 );
 
@@ -67,7 +68,7 @@ CREATE TABLE ingredient_in_grocery_list (
   unit VARCHAR(255) NOT NULL
 );
 
-CREATE INDEX idx_user_email ON users(email);
+CREATE INDEX idx_user_username ON users(username);
 CREATE INDEX idx_usercreatedrecipe_created_by ON user_created_recipes(created_by);
 CREATE INDEX idx_recipestep_recipe_id ON recipe_steps(recipe_id);
 CREATE INDEX idx_recipesaved_saved_by ON recipe_saved(saved_by);

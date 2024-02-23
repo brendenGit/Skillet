@@ -1,9 +1,9 @@
 -- users
-INSERT INTO "users" (email, password, first_name, last_name, is_creator, is_admin, creator_description)
+INSERT INTO "users" (username, email, password, first_name, last_name, is_admin, is_creator, creator_description)
 VALUES
-('john.doe@example.com', 'password123', 'John', 'Doe', TRUE, FALSE, 'Experienced chef with a passion for Italian cuisine'),
-('bob.baker@example.com', 'password123', 'Robert', 'Baker', FALSE, FALSE, NULL),
-('jane.smith@example.com', 'password456', 'Jane', 'Smith', FALSE, TRUE, NULL);
+('Chef John', 'john.doe@example.com', 'password123', 'John', 'Doe', FALSE, TRUE, 'Experienced chef with a passion for Italian cuisine'),
+('bbaker', 'bob.baker@example.com', 'password123', 'Robert', 'Baker', FALSE, FALSE, NULL),
+('jsmith', 'jane.smith@example.com', 'password456', 'Jane', 'Smith', FALSE, TRUE, NULL);
 
 -- user_created_recipes
 INSERT INTO user_created_recipes (created_by, title, description, image_url)

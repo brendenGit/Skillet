@@ -3,17 +3,15 @@
 /** Routes for users. */
 
 const jsonschema = require("jsonschema");
-const express = require("express");
-const User = require("../../models/user/user.js");
-const newUserSchema = require("../../schemas/newUser.json");
-// const userUpdateSchema = require("../schemas/userUpdate.json");
 
+const express = require("express");
 const { ensureCorrectUserOrAdmin, ensureAdmin } = require("../../middleware/auth.js");
 const { BadRequestError } = require("../../expressError.js");
-const { createToken } = require("../../helpers/tokens.js");
-
+const User = require("../../models/user/user.js");
+const { createToken } = require("../../helpers/tokens.cjs");
 
 const router = express.Router();
+
 
 /** POST / { user }  => { user, token }
  *
@@ -22,22 +20,22 @@ const router = express.Router();
  * admin.
  *
  * This returns the newly created user and an authentication token for them:
- *  {username: string, isAdmin: boolean, isCreator: boolean, token }
+ *  {user: { username, firstName, lastName, email, isAdmin }, token }
  *
  * Authorization required: admin
  **/
 
 router.post("/", ensureAdmin, async function (req, res, next) {
   try {
-    const validator = jsonschema.validate(req.body, newUserSchema);
+    const validator = jsonschema.validate(req.body, userNewSchema);
     if (!validator.valid) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
 
     const user = await User.register(req.body);
-    // const token = createToken(user);
-    return res.status(201).json({ user });
+    const token = createToken(user);
+    return res.status(201).json({ user, token });
   } catch (err) {
     return next(err);
   }
@@ -51,9 +49,10 @@ router.post("/", ensureAdmin, async function (req, res, next) {
  * Authorization required: admin or same user-as-:username
  **/
 
-router.get("/:username", async function (req, res, next) {
+router.get("/:email", async function (req, res, next) {
+  //want to make this /profile and have email be sent in reqs body
   try {
-    const user = await User.get(req.params.username);
+    const user = await User.get(req.params.email);
     return res.json({ user });
   } catch (err) {
     return next(err);

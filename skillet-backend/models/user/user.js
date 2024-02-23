@@ -14,6 +14,70 @@ const { BCRYPT_WORK_FACTOR } = require("../../config.js");
 /** Related functions for users. */
 
 class User {
+
+  /** Register user with data.
+   *
+   * Returns {username: string, isAdmin: boolean, isCreator: boolean}
+   *
+   * Throws BadRequestError on duplicates.
+   **/
+
+  static async register(
+    { username, email, password, firstName, lastName, isAdmin, isCreator, creatorDescription }) {
+    const duplicateEmailCheck = await db.query(
+      `SELECT email
+       FROM users
+       WHERE email = $1`,
+      [email],
+    );
+
+    if (duplicateEmailCheck.rows[0]) {
+      throw new BadRequestError(`An account with that email already exists`);
+    }
+
+    const duplicateUsernameCheck = await db.query(
+      `SELECT username
+       FROM users
+       WHERE username = $1`,
+      [username],
+    );
+
+    if (duplicateUsernameCheck.rows[0]) {
+      throw new BadRequestError(`An account with that username already exists`);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
+
+    const result = await db.query(
+      `INSERT INTO users
+           (username,
+            email,
+            password,
+            first_name,
+            last_name,
+            is_admin,
+            is_creator,
+            creator_description)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+           RETURNING username, is_admin AS "isAdmin", is_creator AS "isCreator"`,
+      [
+        username,
+        email,
+        hashedPassword,
+        firstName,
+        lastName,
+        isAdmin,
+        isCreator,
+        creatorDescription,
+      ],
+    );
+
+    const user = result.rows[0];
+
+    return user;
+  }
+
+
   /** authenticate user with username, password.
    * @todo
    * complete what this returns
@@ -50,63 +114,12 @@ class User {
     throw new UnauthorizedError("Invalid username/password");
   }
 
-
-  /** Register user with data.
-   *
-   * Returns { }
-   *
-   * Throws BadRequestError on duplicates.
-   **/
-
-  static async register(
-    { email, password, firstName, lastName, isCreator, isAdmin, creatorDescription }) {
-    const duplicateCheck = await db.query(
-      `SELECT email
-       FROM users
-       WHERE email = $1`,
-      [email],
-    );
-
-    if (duplicateCheck.rows[0]) {
-      throw new BadRequestError(`An account with that email already exists!`);
-    }
-
-    const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
-
-    const result = await db.query(
-      `INSERT INTO users
-           (email,
-            password,
-            first_name,
-            last_name,
-            is_creator,
-            is_admin,
-            creator_description)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)
-           RETURNING email, first_name AS "firstName", last_name AS "lastName", is_creator AS "isCreator",
-           is_admin AS "isAdmin", creator_description AS "creatorDescription`,
-      [
-        email,
-        hashedPassword,
-        firstName,
-        lastName,
-        isCreator,
-        isAdmin,
-        creatorDescription,
-      ],
-    );
-
-    const user = result.rows[0];
-
-    return user;
-  }
-
-  /** Find all users.
+  /** Find all users that are creators.
    *
    * Returns [{ username, first_name, last_name, email, is_admin }, ...]
    **/
 
-  static async findAll() {
+  static async findAllCreators() {
     const result = await db.query(
       `SELECT username,
                   first_name AS "firstName",
@@ -204,35 +217,6 @@ class User {
     const user = result.rows[0];
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
-  }
-
-  /** Apply for job: update db, returns undefined.
-   *
-   * - username: username applying for job
-   * - jobId: job id
-   **/
-
-  static async applyToJob(username, jobId) {
-    const preCheck = await db.query(
-      `SELECT id
-           FROM jobs
-           WHERE id = $1`, [jobId]);
-    const job = preCheck.rows[0];
-
-    if (!job) throw new NotFoundError(`No job: ${jobId}`);
-
-    const preCheck2 = await db.query(
-      `SELECT username
-           FROM users
-           WHERE username = $1`, [username]);
-    const user = preCheck2.rows[0];
-
-    if (!user) throw new NotFoundError(`No username: ${username}`);
-
-    await db.query(
-      `INSERT INTO applications (job_id, username)
-           VALUES ($1, $2)`,
-      [jobId, username]);
   }
 }
 
