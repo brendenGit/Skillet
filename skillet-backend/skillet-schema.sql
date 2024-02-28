@@ -5,41 +5,12 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   first_name VARCHAR(255) NOT NULL,
   last_name VARCHAR(255) NOT NULL,
-  is_admin BOOLEAN NOT NULL DEFAULT FALSE,
-  is_creator BOOLEAN NOT NULL DEFAULT FALSE,
-  creator_description TEXT
-);
-
-CREATE TABLE user_created_recipes (
-  id SERIAL PRIMARY KEY,
-  created_by INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  description TEXT NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  image_url VARCHAR(255) DEFAULT 'skillet_logo.png'
-);
-
-CREATE TABLE recipe_steps (
-  id SERIAL PRIMARY KEY,
-  recipe_id INTEGER NOT NULL REFERENCES user_created_recipes ON DELETE CASCADE,
-  step_number INTEGER NOT NULL,
-  description TEXT NOT NULL
-);
-
-CREATE TABLE recipe_ingredients (
-  id SERIAL PRIMARY KEY,
-  recipe_id INTEGER NOT NULL REFERENCES user_created_recipes ON DELETE CASCADE,
-  name VARCHAR(255) NOT NULL,
-  quantity VARCHAR(255) NOT NULL,
-  unit VARCHAR(255) NOT NULL
+  is_admin BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE recipe_saved (
   recipe_id INTEGER NOT NULL,
-  recipe_source VARCHAR(255) NOT NULL,
-  saved_by INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
-  UNIQUE (recipe_id, saved_by)
+  saved_by INTEGER NOT NULL REFERENCES users ON DELETE CASCADE
 );
 
 CREATE TABLE recipe_stats (
@@ -50,7 +21,7 @@ CREATE TABLE recipe_stats (
 
 CREATE TABLE recipe_rated_by (
   recipe_id INTEGER NOT NULL,
-  rated_by INTEGER NOT NULL REFERENCES users,
+  rated_by INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
   UNIQUE (recipe_id, rated_by)
 );
 
@@ -69,8 +40,6 @@ CREATE TABLE ingredient_in_grocery_list (
 );
 
 CREATE INDEX idx_user_username ON users(username);
-CREATE INDEX idx_usercreatedrecipe_created_by ON user_created_recipes(created_by);
-CREATE INDEX idx_recipestep_recipe_id ON recipe_steps(recipe_id);
 CREATE INDEX idx_recipesaved_saved_by ON recipe_saved(saved_by);
 CREATE INDEX idx_grocerylist_created_by ON grocery_lists(created_by);
 CREATE INDEX idx_ingredientingrocerylist_grocery_list_id ON ingredient_in_grocery_list(grocery_list_id);

@@ -22,24 +22,18 @@
             "minLength": 1,
             "maxLength": 255
         },
-        "first_name": {
+        "firstName": {
             "type": "string",
             "minLength": 1,
             "maxLength": 255
         },
-        "last_name": {
+        "lastName": {
             "type": "string",
             "minLength": 1,
             "maxLength": 255
         },
-        "is_admin": {
+        "isAdmin": {
             "type": "boolean"
-        },
-        "is_creator": {
-            "type": "boolean"
-        },
-        "creator_description": {
-            "type": "string"
         }
     },
     "additionalProperties": false,
@@ -47,9 +41,8 @@
         "username",
         "email",
         "password",
-        "first_name",
-        "last_name",
-        "is_admin",
-        "is_creator"
+        "firstName",
+        "lastName",
+        "isAdmin"
     ]
 }

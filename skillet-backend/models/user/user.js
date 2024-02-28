@@ -2,7 +2,7 @@
 
 const db = require("../../db.js");
 const bcrypt = require("bcrypt");
-const { sqlForPartialUpdate } = require("../../helpers/sql.cjs");
+const { sqlForPartialUpdate } = require("../../helpers/sql.js");
 const {
   NotFoundError,
   BadRequestError,
@@ -17,13 +17,13 @@ class User {
 
   /** Register user with data.
    *
-   * Returns {username: string, isAdmin: boolean, isCreator: boolean}
+   * Returns { user : {  id: int, username: string, firstName: string , isAdmin: boolean }}
    *
    * Throws BadRequestError on duplicates.
    **/
 
   static async register(
-    { username, email, password, firstName, lastName, isAdmin, isCreator, creatorDescription }) {
+    { username, email, password, firstName, lastName, isAdmin }) {
     const duplicateEmailCheck = await db.query(
       `SELECT email
        FROM users
@@ -55,20 +55,16 @@ class User {
             password,
             first_name,
             last_name,
-            is_admin,
-            is_creator,
-            creator_description)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-           RETURNING username, is_admin AS "isAdmin", is_creator AS "isCreator"`,
+            is_admin)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           RETURNING id, username, first_name AS "firstName", is_admin AS "isAdmin"`,
       [
         username,
         email,
         hashedPassword,
         firstName,
         lastName,
-        isAdmin,
-        isCreator,
-        creatorDescription,
+        isAdmin
       ],
     );
 
@@ -79,9 +75,8 @@ class User {
 
 
   /** authenticate user with username, password.
-   * @todo
-   * complete what this returns
-   * Returns { }
+   * 
+   * Returns { user : {  id: int, username: string, firstName: string , isAdmin: boolean }}
    *
    * Throws UnauthorizedError is user not found or wrong password.
    **/
@@ -89,12 +84,11 @@ class User {
   static async authenticate(username, password) {
     // try to find the user first
     const result = await db.query(
-      `SELECT username,
-                  password,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
-                  email,
-                  is_admin AS "isAdmin"
+      `SELECT id,
+              username,
+              password,
+              first_name AS "firstName",
+              is_admin AS "isAdmin"
            FROM users
            WHERE username = $1`,
       [username],
@@ -114,44 +108,28 @@ class User {
     throw new UnauthorizedError("Invalid username/password");
   }
 
-  /** Find all users that are creators.
+
+  /** Given a username, return data about user.
    *
-   * Returns [{ username, first_name, last_name, email, is_admin }, ...]
-   **/
-
-  static async findAllCreators() {
-    const result = await db.query(
-      `SELECT username,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
-                  email,
-                  is_admin AS "isAdmin"
-           FROM users
-           ORDER BY username`,
-    );
-
-    return result.rows;
-  }
-
-  /** Given an email, return data about user.
-   *
-   * Returns { username, first_name, last_name, is_admin, jobs }
-   *   where jobs is { id, title, company_handle, company_name, state }
+   * Returns { username, email, first_name, last_name  }
    *
    * Throws NotFoundError if user not found.
    **/
 
-  static async get(email) {
+  static async get(username) {
     const userRes = await db.query(
-      `SELECT first_name AS "firstName", last_name AS "lastName", creator_description AS "creatorDescription"
+      `SELECT username,
+              email,
+              first_name AS "firstName", 
+              last_name AS "lastName"
            FROM users
-           WHERE email = $1`,
-      [email],
+           WHERE username = $1`,
+      [username],
     );
 
     const user = userRes.rows[0];
 
-    if (!user) throw new NotFoundError(`No user with email: ${email}`);
+    if (!user) throw new NotFoundError(`No user with username: ${username}`);
 
     return user;
   }
@@ -167,10 +145,6 @@ class User {
    * Returns { username, firstName, lastName, email, isAdmin }
    *
    * Throws NotFoundError if not found.
-   *
-   * WARNING: this function can set a new password or make a user an admin.
-   * Callers of this function must be certain they have validated inputs to this
-   * or a serious security risks are opened.
    */
 
   static async update(username, data) {
@@ -182,8 +156,7 @@ class User {
       data,
       {
         firstName: "first_name",
-        lastName: "last_name",
-        isAdmin: "is_admin",
+        lastName: "last_name"
       });
     const usernameVarIdx = "$" + (values.length + 1);
 

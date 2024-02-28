@@ -2,15 +2,15 @@
 
 /** Routes for authentication. */
 
+const User = require("../../models/user/user.js");
 const jsonschema = require("jsonschema");
-
-const User = require("../models/user.cjs");
 const express = require("express");
+const authUserSchema = require("../../schemas/authUser.json");
+// const userRegisterSchema = require("../schemas/userRegister.json");
+const { createToken } = require("../../helpers/tokens.js");
+const { BadRequestError } = require("../../expressError.js");
+
 const router = new express.Router();
-const { createToken } = require("../../helpers/tokens.cjs");
-const userAuthSchema = require("../schemas/userAuth.json");
-const userRegisterSchema = require("../schemas/userRegister.json");
-const { BadRequestError } = require("../expressError.cjs");
 
 /** POST /auth/token:  { username, password } => { token }
  *
@@ -21,7 +21,7 @@ const { BadRequestError } = require("../expressError.cjs");
 
 router.post("/token", async function (req, res, next) {
   try {
-    const validator = jsonschema.validate(req.body, userAuthSchema);
+    const validator = jsonschema.validate(req.body, authUserSchema);
     if (!validator.valid) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
@@ -29,7 +29,7 @@ router.post("/token", async function (req, res, next) {
     const { username, password } = req.body;
     const user = await User.authenticate(username, password);
     const token = createToken(user);
-    return res.json({ token, user });
+    return res.json({ token });
   } catch (err) {
     return next(err);
   }

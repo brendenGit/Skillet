@@ -7,10 +7,10 @@ const cors = require("cors");
 
 const { NotFoundError } = require("./expressError.js");
 
-// const { authenticateJWT } = require("./middleware/auth.cjs");
-// const authRoutes = require("./routes/auth.cjs");
+const { authenticateJWT } = require("./middleware/auth.js");
+const authRoutes = require("./routes/auth/auth.js");
 // const companiesRoutes = require("./routes/companies.cjs");
-const usersRoutes = require("./routes/users.js");
+const usersRoutes = require("./routes/users/users.js");
 // const jobsRoutes = require("./routes/jobs.cjs");
 
 const morgan = require("morgan");
@@ -20,9 +20,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
-// app.use(authenticateJWT);
+app.use(authenticateJWT);
 
-// app.use("/auth", authRoutes);
+app.use("/auth", authRoutes);
 // app.use("/companies", companiesRoutes);
 app.use("/users", usersRoutes);
 // app.use("/jobs", jobsRoutes);

@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 const User = require("../../models/user/user.js");
 const newUserSchema = require("../../schemas/newUser.json");
-// const userUpdateSchema = require("../schemas/userUpdate.json");
+const userUpdateSchema = require("../../schemas/updateUser.json");
 
 const { ensureCorrectUserOrAdmin, ensureAdmin } = require("../../middleware/auth.js");
 const { BadRequestError } = require("../../expressError.js");
@@ -22,7 +22,7 @@ const router = express.Router();
  * admin.
  *
  * This returns the newly created user and an authentication token for them:
- *  {username: string, isAdmin: boolean, isCreator: boolean, token }
+ *  { user: { username: string, isAdmin: boolean } token }
  *
  * Authorization required: admin
  **/
@@ -36,8 +36,8 @@ router.post("/", ensureAdmin, async function (req, res, next) {
     }
 
     const user = await User.register(req.body);
-    // const token = createToken(user);
-    return res.status(201).json({ user });
+    const token = createToken(user);
+    return res.status(201).json({ user, token });
   } catch (err) {
     return next(err);
   }
@@ -51,7 +51,7 @@ router.post("/", ensureAdmin, async function (req, res, next) {
  * Authorization required: admin or same user-as-:username
  **/
 
-router.get("/:username", async function (req, res, next) {
+router.get("/:username", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
     const user = await User.get(req.params.username);
     return res.json({ user });
@@ -66,7 +66,7 @@ router.get("/:username", async function (req, res, next) {
  * Data can include:
  *   { firstName, lastName, password, email }
  *
- * Returns { username, firstName, lastName, email, isAdmin }
+ * Returns { username, firstName, lastName, email }
  *
  * Authorization required: admin or same-user-as-:username
  **/

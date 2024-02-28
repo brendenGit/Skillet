@@ -13,7 +13,7 @@ const {
   commonAfterEach,
   commonAfterAll,
   testJobIds,
-} = require("./_testCommon");
+} = require("../_testCommon.js");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
