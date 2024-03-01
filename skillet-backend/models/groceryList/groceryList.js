@@ -1,90 +1,66 @@
 "use strict";
 
-const db = require("../db.cjs");
-const { NotFoundError} = require("../expressError.cjs");
-const { sqlForPartialUpdate } = require("../../helpers/sql.cjs");
+const db = require("../../db");
+const { NotFoundError } = require("../../expressError");
+const { sqlForPartialUpdate } = require("../../helpers/sql");
 
 
 /** Related functions for companies. */
 
-class Job {
-  /** Create a job (from data), update db, return new job data.
+class GroceryList {
+  /** Create a grocery list 
    *
-   * data should be { title, salary, equity, companyHandle }
+   * requires userId to create
+   * @userId stored {here} when user is logged in
    *
-   * Returns { id, title, salary, equity, companyHandle }
+   * Returns { id: int, groceryListName: string, createdAt: string  }
+   * 
    **/
 
-  static async create(data) {
-    const result = await db.query(
-          `INSERT INTO jobs (title,
-                             salary,
-                             equity,
-                             company_handle)
-           VALUES ($1, $2, $3, $4)
-           RETURNING id, title, salary, equity, company_handle AS "companyHandle"`,
-        [
-          data.title,
-          data.salary,
-          data.equity,
-          data.companyHandle,
-        ]);
-    let job = result.rows[0];
+  static async create(userId, groceryListName) {
+    const queryString =
+      groceryListName ?
+        `INSERT INTO grocery_lists (created_by,
+                                    grocery_list_name)
+        VALUES ($1, $2)
+        RETURNING id, grocery_list_name AS "groceryListName", created_at AS "createdAt"`
+        :
+        `INSERT INTO grocery_lists (created_by)
+        VALUES ($1)
+        RETURNING id, grocery_list_name AS "groceryListName", created_at AS "createdAt"`
 
-    return job;
+    const variables =
+      groceryListName ?
+        [userId, groceryListName]
+        :
+        [userId]
+
+    const result = await db.query(queryString, variables);
+    let groceryList = result.rows[0];
+
+    return groceryList;
   }
 
-  /** Find all jobs (optional filter on searchFilters).
+  /** Find all grocery lists for a specific user.
    *
-   * searchFilters (all optional):
-   * - minSalary
-   * - hasEquity (true returns only jobs with equity > 0, other values ignored)
-   * - title (will find case-insensitive, partial matches)
+   * requires userId to run
+   * @userId stored {here} when user is logged in
    *
-   * Returns [{ id, title, salary, equity, companyHandle, companyName }, ...]
+   * Returns list of grocery list objects [{ id: int, groceryListName: string, createdAt: date}, ...]
+   * 
    * */
 
-  static async findAll({ minSalary, hasEquity, title } = {}) {
-    let query = `SELECT j.id,
-                        j.title,
-                        j.salary,
-                        j.equity,
-                        j.company_handle AS "companyHandle",
-                        c.name AS "companyName"
-                 FROM jobs j 
-                   LEFT JOIN companies AS c ON c.handle = j.company_handle`;
-    let whereExpressions = [];
-    let queryValues = [];
-
-    // For each possible search term, add to whereExpressions and
-    // queryValues so we can generate the right SQL
-
-    if (minSalary !== undefined) {
-      queryValues.push(minSalary);
-      whereExpressions.push(`salary >= $${queryValues.length}`);
-    }
-
-    if (hasEquity === true) {
-      whereExpressions.push(`equity > 0`);
-    }
-
-    if (title !== undefined) {
-      queryValues.push(`%${title}%`);
-      whereExpressions.push(`title ILIKE $${queryValues.length}`);
-    }
-
-    if (whereExpressions.length > 0) {
-      query += " WHERE " + whereExpressions.join(" AND ");
-    }
-
-    // Finalize query and return results
-
-    query += " ORDER BY title";
-    const jobsRes = await db.query(query, queryValues);
-    return jobsRes.rows;
+  static async getGroceryLists(userId) {
+    const groceryListsRes = await db.query(`SELECT id,
+                                                  created_at as "createdAt",
+                                                  grocery_list_name as "groceryListName"
+                                            FROM grocery_lists 
+                                            WHERE created_by = $1`,
+      [userId]);
+    return groceryListsRes.rows;
   }
 
-  /** Given a job id, return data about job.
+  /** Given a grocery list id, return data about grocery list.
    *
    * Returns { id, title, salary, equity, companyHandle, company }
    *   where company is { handle, name, description, numEmployees, logoUrl }
@@ -93,32 +69,29 @@ class Job {
    **/
 
   static async get(id) {
-    const jobRes = await db.query(
-          `SELECT id,
-                  title,
-                  salary,
-                  equity,
-                  company_handle AS "companyHandle"
-           FROM jobs
-           WHERE id = $1`, [id]);
+    const groceryListRes = await db.query(
+      `SELECT id,
+              created_at AS "createdAt",
+              grocery_list_name AS "groceryListName"
+      FROM grocery_lists
+      WHERE id = $1`,
+      [id]);
 
-    const job = jobRes.rows[0];
+    const ingredientRes = await db.query(
+      `SELECT ingredient_name AS "ingredientName",
+              amount,
+              unit
+        FROM ingredient_in_grocery_list
+        WHERE grocery_list_id = $1`,
+      [id]);
 
-    if (!job) throw new NotFoundError(`No job: ${id}`);
 
-    const companiesRes = await db.query(
-          `SELECT handle,
-                  name,
-                  description,
-                  num_employees AS "numEmployees",
-                  logo_url AS "logoUrl"
-           FROM companies
-           WHERE handle = $1`, [job.companyHandle]);
+    const groceryList = groceryListRes.rows[0];
+    const ingredientList = ingredientRes.rows;
 
-    delete job.companyHandle;
-    job.company = companiesRes.rows[0];
+    if (!groceryList) throw new NotFoundError(`No grocery list: ${id}`);
 
-    return job;
+    return { groceryList: { ...groceryList, ingredients: ingredientList } };
   }
 
   /** Update job data with `data`.
@@ -135,8 +108,8 @@ class Job {
 
   static async update(id, data) {
     const { setCols, values } = sqlForPartialUpdate(
-        data,
-        {});
+      data,
+      {});
     const idVarIdx = "$" + (values.length + 1);
 
     const querySql = `UPDATE jobs 
@@ -155,21 +128,21 @@ class Job {
     return job;
   }
 
-  /** Delete given job from database; returns undefined.
+  /** Delete given grocery list from database; returns undefined.
    *
-   * Throws NotFoundError if company not found.
+   * Throws NotFoundError if grocery list not found.
    **/
 
   static async remove(id) {
     const result = await db.query(
-          `DELETE
-           FROM jobs
+      `DELETE
+           FROM grocery_lists
            WHERE id = $1
            RETURNING id`, [id]);
-    const job = result.rows[0];
+    const groceryList = result.rows[0];
 
-    if (!job) throw new NotFoundError(`No job: ${id}`);
+    if (!groceryList) throw new NotFoundError(`No grocery list: ${id}`);
   }
 }
 
-module.exports = Job;
+module.exports = GroceryList;

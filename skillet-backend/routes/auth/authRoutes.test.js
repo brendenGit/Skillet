@@ -9,7 +9,7 @@ const {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-} = require("./_testCommon");
+} = require("../_testCommon");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -86,7 +86,12 @@ describe("POST /auth/register", function () {
         });
     expect(resp.statusCode).toEqual(201);
     expect(resp.body).toEqual({
-      "token": expect.any(String),
+      user: {
+        username: "new",
+        firstName: "first",
+        id: expect.any(Number),
+        isAdmin: false,
+      }, token: expect.any(String),
     });
   });
 

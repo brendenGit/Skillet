@@ -17,7 +17,7 @@ CREATE TABLE recipe_stats (
   recipe_id INTEGER NOT NULL PRIMARY KEY,
   rating INTEGER NOT NULL DEFAULT 0,
   save_count INTEGER NOT NULL DEFAULT 0
-);
+); 
 
 CREATE TABLE recipe_rated_by (
   recipe_id INTEGER NOT NULL,
@@ -28,8 +28,8 @@ CREATE TABLE recipe_rated_by (
 CREATE TABLE grocery_lists (
   id SERIAL PRIMARY KEY,
   created_by INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  grocery_list_name VARCHAR(255) NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  grocery_list_name VARCHAR(255) DEFAULT NULL
 );
 
 CREATE TABLE ingredient_in_grocery_list (

@@ -4,18 +4,17 @@ const request = require("supertest");
 
 const db = require("../../db.js");
 const app = require("../../app.js");
-const User = require("../models/user");
+const User = require("../../models/user/user.js");
 
 const {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  testJobIds,
   u1Token,
   u2Token,
   adminToken,
-} = require("./_testCommon");
+} = require("../_testCommon.js");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -42,8 +41,7 @@ describe("POST /users", function () {
       user: {
         username: "u-new",
         firstName: "First-new",
-        lastName: "Last-newL",
-        email: "new@email.com",
+        id: expect.any(Number),
         isAdmin: false,
       }, token: expect.any(String),
     });
@@ -66,8 +64,7 @@ describe("POST /users", function () {
       user: {
         username: "u-new",
         firstName: "First-new",
-        lastName: "Last-newL",
-        email: "new@email.com",
+        id: expect.any(Number),
         isAdmin: true,
       }, token: expect.any(String),
     });
@@ -128,65 +125,6 @@ describe("POST /users", function () {
   });
 });
 
-/************************************** GET /users */
-
-describe("GET /users", function () {
-  test("works for admins", async function () {
-    const resp = await request(app)
-        .get("/users")
-        .set("authorization", `Bearer ${adminToken}`);
-    expect(resp.body).toEqual({
-      users: [
-        {
-          username: "u1",
-          firstName: "U1F",
-          lastName: "U1L",
-          email: "user1@user.com",
-          isAdmin: false,
-        },
-        {
-          username: "u2",
-          firstName: "U2F",
-          lastName: "U2L",
-          email: "user2@user.com",
-          isAdmin: false,
-        },
-        {
-          username: "u3",
-          firstName: "U3F",
-          lastName: "U3L",
-          email: "user3@user.com",
-          isAdmin: false,
-        },
-      ],
-    });
-  });
-
-  test("unauth for non-admin users", async function () {
-    const resp = await request(app)
-        .get("/users")
-        .set("authorization", `Bearer ${u1Token}`);
-    expect(resp.statusCode).toEqual(401);
-  });
-
-  test("unauth for anon", async function () {
-    const resp = await request(app)
-        .get("/users");
-    expect(resp.statusCode).toEqual(401);
-  });
-
-  test("fails: test next() handler", async function () {
-    // there's no normal failure event which will cause this route to fail ---
-    // thus making it hard to test that the error-handler works with it. This
-    // should cause an error, all right :)
-    await db.query("DROP TABLE users CASCADE");
-    const resp = await request(app)
-        .get("/users")
-        .set("authorization", `Bearer ${adminToken}`);
-    expect(resp.statusCode).toEqual(500);
-  });
-});
-
 /************************************** GET /users/:username */
 
 describe("GET /users/:username", function () {
@@ -194,14 +132,13 @@ describe("GET /users/:username", function () {
     const resp = await request(app)
         .get(`/users/u1`)
         .set("authorization", `Bearer ${adminToken}`);
+    console.log(resp.body);
     expect(resp.body).toEqual({
       user: {
         username: "u1",
         firstName: "U1F",
         lastName: "U1L",
-        email: "user1@user.com",
-        isAdmin: false,
-        applications: [testJobIds[0]],
+        email: "user1@user.com"
       },
     });
   });
@@ -215,9 +152,7 @@ describe("GET /users/:username", function () {
         username: "u1",
         firstName: "U1F",
         lastName: "U1L",
-        email: "user1@user.com",
-        isAdmin: false,
-        applications: [testJobIds[0]],
+        email: "user1@user.com"
       },
     });
   });
@@ -375,58 +310,6 @@ describe("DELETE /users/:username", function () {
   test("not found if user missing", async function () {
     const resp = await request(app)
         .delete(`/users/nope`)
-        .set("authorization", `Bearer ${adminToken}`);
-    expect(resp.statusCode).toEqual(404);
-  });
-});
-
-/************************************** POST /users/:username/jobs/:id */
-
-describe("POST /users/:username/jobs/:id", function () {
-  test("works for admin", async function () {
-    const resp = await request(app)
-        .post(`/users/u1/jobs/${testJobIds[1]}`)
-        .set("authorization", `Bearer ${adminToken}`);
-    expect(resp.body).toEqual({ applied: testJobIds[1] });
-  });
-
-  test("works for same user", async function () {
-    const resp = await request(app)
-        .post(`/users/u1/jobs/${testJobIds[1]}`)
-        .set("authorization", `Bearer ${u1Token}`);
-    expect(resp.body).toEqual({ applied: testJobIds[1] });
-  });
-
-  test("unauth for others", async function () {
-    const resp = await request(app)
-        .post(`/users/u1/jobs/${testJobIds[1]}`)
-        .set("authorization", `Bearer ${u2Token}`);
-    expect(resp.statusCode).toEqual(401);
-  });
-
-  test("unauth for anon", async function () {
-    const resp = await request(app)
-        .post(`/users/u1/jobs/${testJobIds[1]}`);
-    expect(resp.statusCode).toEqual(401);
-  });
-
-  test("not found for no such username", async function () {
-    const resp = await request(app)
-        .post(`/users/nope/jobs/${testJobIds[1]}`)
-        .set("authorization", `Bearer ${adminToken}`);
-    expect(resp.statusCode).toEqual(404);
-  });
-
-  test("not found for no such job", async function () {
-    const resp = await request(app)
-        .post(`/users/u1/jobs/0`)
-        .set("authorization", `Bearer ${adminToken}`);
-    expect(resp.statusCode).toEqual(404);
-  });
-
-  test("bad request invalid job id", async function () {
-    const resp = await request(app)
-        .post(`/users/u1/jobs/0`)
         .set("authorization", `Bearer ${adminToken}`);
     expect(resp.statusCode).toEqual(404);
   });
