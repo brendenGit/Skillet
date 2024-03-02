@@ -34,9 +34,9 @@ VALUES
  (2, 'Party Snacks'); 
 
 -- ingredient_in_grocery_list
-INSERT INTO ingredient_in_grocery_list (grocery_list_id, ingredient_name, amount, unit)
+INSERT INTO ingredient_in_grocery_list (grocery_list_id, ingredient_id, ingredient_name, amount, unit)
 VALUES 
-  (1, 'Apples', 2.00, 'lbs'),
-  (1, 'Ground Beef', 1.50, 'lbs'),
-  (2, 'Potato Chips', 1.00, 'bag'),
-  (2, 'Salsa', 16.00, 'oz');
+  (1, 1, 'Apples', 2.00, 'lbs'),
+  (1, 2, 'Ground Beef', 1.50, 'lbs'),
+  (2, 3, 'Potato Chips', 1.00, 'bag'),
+  (2, 4, 'Salsa', 16.00, 'oz');

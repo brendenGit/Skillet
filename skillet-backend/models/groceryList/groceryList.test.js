@@ -7,8 +7,7 @@ const {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
-  commonAfterAll,
-  testJobIds,
+  commonAfterAll
 } = require("../_testCommon.js");
 
 beforeAll(commonBeforeAll);
@@ -125,52 +124,86 @@ describe("get", function () {
   });
 });
 
-// /************************************** update */
+/************************************** updateOrAddIngredient */
 
-// describe("update", function () {
-//   let updateData = {
-//     title: "New",
-//     salary: 500,
-//     equity: "0.5",
-//   };
-//   test("works", async function () {
-//     let job = await Job.update(testJobIds[0], updateData);
-//     expect(job).toEqual({
-//       id: testJobIds[0],
-//       companyHandle: "c1",
-//       ...updateData,
-//     });
-//   });
+describe("updateOrAddIngredient", function () {
+  const ingredientAddData = {
+    ingredientId: 10,
+    ingredientName: "flour",
+    amount: 2,
+    unit: "cups",
+    consistency: "SOLID"
+  }
 
-//   test("not found if no such job", async function () {
-//     try {
-//       await Job.update(0, {
-//         title: "test",
-//       });
-//       fail();
-//     } catch (err) {
-//       expect(err instanceof NotFoundError).toBeTruthy();
-//     }
-//   });
+  const ingredientsAdd = {
+    ingredients: [ingredientAddData]
+  };
 
-//   test("bad request with no data", async function () {
-//     try {
-//       await Job.update(testJobIds[0], {});
-//       fail();
-//     } catch (err) {
-//       expect(err instanceof BadRequestError).toBeTruthy();
-//     }
-//   });
-// });
+  const ingredientAddExistingData = {
+    ingredientId: 1,
+    ingredientName: "white rice",
+    amount: 2,
+    unit: "cups",
+    consistency: "SOLID"
+  }
 
-/************************************** remove */
+  const ingredientsAddExisting = {
+    ingredients: [ingredientAddExistingData]
+  };
+
+  test("adding new ingredient works", async function () {
+    const groceryListId = await getGroceryListId();
+    const addedIngredient = await GroceryList.updateOrAddIngredient(groceryListId, ingredientsAdd);
+    const groceryList = await GroceryList.get(groceryListId);
+    expect(addedIngredient).toEqual({
+      ingredientName: "flour",
+      amount: "16.00",
+      unit: "oz"
+    });
+    expect(groceryList.groceryList.ingredients.some(ingredient => ingredient.ingredientName === "flour")).toBe(true);
+  });
+
+  test("adding an existing ingredient works", async function () {
+    const groceryListId = await getGroceryListId();
+    const updatedIngredient = await GroceryList.updateOrAddIngredient(groceryListId, ingredientsAddExisting);
+    expect(updatedIngredient).toEqual({
+      amount: "32.00",
+      ingredientName: "white rice",
+      unit: "oz"
+    });
+  });
+});
+
+/************************************** remove ingredient from grocery list */
+
+describe("removeIngredient", function () {
+  test("works", async function () {
+    const groceryListId = await getGroceryListId();
+    const res = await GroceryList.removeIngredient(groceryListId, 1);
+    expect(res).toEqual({
+      removed: { ingredientName: 'white rice' }
+    });
+  });
+
+  test("not found if no such ingredient", async function () {
+    try {
+      const groceryListId = await getGroceryListId();
+      await GroceryList.removeIngredient(groceryListId, 0);
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+});
+
+/************************************** remove grocery list*/
 
 describe("remove", function () {
   test("works", async function () {
     const groceryListId = await getGroceryListId();
     await GroceryList.remove(groceryListId);
     const res = await db.query(
-        "SELECT id FROM grocery_lists WHERE id=$1", [groceryListId]);
+      "SELECT id FROM grocery_lists WHERE id=$1", [groceryListId]);
     expect(res.rows.length).toEqual(0);
   });
 

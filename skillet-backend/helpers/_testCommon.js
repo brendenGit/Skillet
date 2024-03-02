@@ -25,27 +25,11 @@ async function commonBeforeAll() {
     ]);
 
   const userId = userIdRes.rows[0].id;
-  const glIdResawait = await db.query(`
+  await db.query(`
         INSERT INTO grocery_lists(created_by,
                                   grocery_list_name)
-        VALUES (${userId}, null),
-               (${userId}, 'test list 1'),
-               (${userId}, 'test list 2'),
-               (${userId}, null)
+        VALUES (${userId}, null)
         RETURNING id`);
-
-  const groceryListId = glIdResawait.rows[0].id;
-  await db.query(`
-        INSERT INTO ingredient_in_grocery_list(grocery_list_id,
-                                               ingredient_id,
-                                               ingredient_name,
-                                               amount,
-                                               unit)
-        VALUES (${groceryListId}, 1, 'white rice', 16, 'oz'),
-               (${groceryListId}, 2, 'salmon', 1, 'pound'),
-               (${groceryListId}, 3, 'olive oil', 2, 'tablespoons'),
-               (${groceryListId}, 4, 'broccoli', 2, 'heads')
-        RETURNING ingredient_name`);
 }
 
 async function commonBeforeEach() {

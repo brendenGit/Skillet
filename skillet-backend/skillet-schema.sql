@@ -33,13 +33,25 @@ CREATE TABLE grocery_lists (
 );
 
 CREATE TABLE ingredient_in_grocery_list (
-  grocery_list_id INTEGER NOT NULL REFERENCES grocery_lists ON DELETE CASCADE ,
-  ingredient_name VARCHAR(255) NOT NULL,
+  grocery_list_id INTEGER NOT NULL REFERENCES grocery_lists ON DELETE CASCADE,
+  ingredient_id INTEGER NOT NULL UNIQUE,
+  ingredient_name VARCHAR(255) NOT NULL UNIQUE,
   amount NUMERIC(5, 2) NOT NULL, 
   unit VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE recipe_in_grocery_list (
+  grocery_list_id INTEGER NOT NULL REFERENCES grocery_lists ON DELETE CASCADE,
+  recipe_id INTEGER NOT NULL,
+  recipe_title VARCHAR(255) NOT NULL,
+  UNIQUE (grocery_list_id, recipe_id)
 );
 
 CREATE INDEX idx_user_username ON users(username);
 CREATE INDEX idx_recipesaved_saved_by ON recipe_saved(saved_by);
 CREATE INDEX idx_grocerylist_created_by ON grocery_lists(created_by);
 CREATE INDEX idx_ingredientingrocerylist_grocery_list_id ON ingredient_in_grocery_list(grocery_list_id);
+CREATE INDEX idx_recipesaved_recipe_id ON recipe_saved(recipe_id);
+CREATE INDEX idx_recipestats_save_count ON recipe_stats(save_count);
+CREATE INDEX idx_reciperatedby_recipe_id ON recipe_rated_by(recipe_id);
+CREATE INDEX idx_ingredientingrocerylist_ingredient_name ON ingredient_in_grocery_list(ingredient_name);

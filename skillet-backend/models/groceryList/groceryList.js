@@ -3,6 +3,7 @@
 const db = require("../../db");
 const { NotFoundError } = require("../../expressError");
 const { sqlForPartialUpdate } = require("../../helpers/sql");
+const { addIngredient, updateIngredient } = require("../../helpers/groceryListHelpers");
 
 
 /** Related functions for companies. */
@@ -78,7 +79,8 @@ class GroceryList {
       [id]);
 
     const ingredientRes = await db.query(
-      `SELECT ingredient_name AS "ingredientName",
+      `SELECT ingredient_id AS "ingredientId",
+              ingredient_name AS "ingredientName",
               amount,
               unit
         FROM ingredient_in_grocery_list
@@ -106,26 +108,41 @@ class GroceryList {
    * Throws NotFoundError if not found.
    */
 
-  static async update(id, data) {
-    const { setCols, values } = sqlForPartialUpdate(
-      data,
-      {});
-    const idVarIdx = "$" + (values.length + 1);
+  static async updateOrAddIngredient(groceryListId, ingredientData) {
+    const groceryList = await GroceryList.get(groceryListId);
+    const ingredientList = groceryList.groceryList.ingredients;
 
-    const querySql = `UPDATE jobs 
-                      SET ${setCols} 
-                      WHERE id = ${idVarIdx} 
-                      RETURNING id, 
-                                title, 
-                                salary, 
-                                equity,
-                                company_handle AS "companyHandle"`;
-    const result = await db.query(querySql, [...values, id]);
-    const job = result.rows[0];
+    for (let ingredient of ingredientData.ingredients) {
+      const { ingredientId, ingredientName, amount, unit, consistency } = ingredient;
+      const isInList = ingredientList.some(ingredient => ingredient.ingredientId === ingredientId);
+      console.log(ingredient.ingredientName);
+      console.log(isInList)
+      if (isInList) {
+        const updatedIngredient = await updateIngredient(groceryListId, ingredientId, amount, unit, consistency)
+        return updatedIngredient;
+      } else {
+        const addedIngredient = await addIngredient(groceryListId, ingredientId, ingredientName, amount, unit, consistency);
+        return addedIngredient;
+      }
+    }
+  }
 
-    if (!job) throw new NotFoundError(`No job: ${id}`);
+  /** Delete given ingredient from grocery list.
+   *
+   * Throws NotFoundError if grocery list not found.
+   **/
 
-    return job;
+  static async removeIngredient(groceryListId, ingredientId) {
+    const result = await db.query(
+      `DELETE
+      FROM ingredient_in_grocery_list
+      WHERE grocery_list_id = $1 AND ingredient_id = $2
+      RETURNING ingredient_name AS "ingredientName"`, [groceryListId, ingredientId]);
+    const ingredient = result.rows[0];
+
+    if (!ingredient) throw new NotFoundError(`No such ingredient in grocery list`);
+
+    return { removed: ingredient };
   }
 
   /** Delete given grocery list from database; returns undefined.
