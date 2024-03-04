@@ -132,7 +132,6 @@ describe("GET /users/:username", function () {
     const resp = await request(app)
         .get(`/users/u1`)
         .set("authorization", `Bearer ${adminToken}`);
-    console.log(resp.body);
     expect(resp.body).toEqual({
       user: {
         username: "u1",

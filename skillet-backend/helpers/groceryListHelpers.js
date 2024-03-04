@@ -173,7 +173,6 @@ async function addIngredient(groceryListId, ingredientId, ingredientName, amount
               VALUES ($1, $2, $3, $4, $5)
               RETURNING ingredient_name AS "ingredientName", amount, unit`,
             [groceryListId, ingredientId, ingredientName, convertedAmount, convertedUnit]);
-        console.log(result.rows[0]);
         return result.rows[0];
     } else {
         return 'custom conversion required';
