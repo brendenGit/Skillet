@@ -151,6 +151,18 @@ describe("updateOrAddIngredient", function () {
     ingredients: [ingredientAddExistingData]
   };
 
+  const zerodIngredient = {
+    ingredientId: 1,
+    ingredientName: "white rice",
+    amount: -2,
+    unit: "cups",
+    consistency: "SOLID"
+  }
+
+  const removeZerodIngredient = {
+    ingredients: [zerodIngredient]
+  };
+
   test("adding new ingredient works", async function () {
     const groceryListId = await getGroceryListId();
     const addedIngredient = await GroceryList.updateOrAddIngredient(groceryListId, ingredientsAdd);
@@ -171,6 +183,13 @@ describe("updateOrAddIngredient", function () {
       ingredientName: "white rice",
       unit: "oz"
     });
+  });
+
+  test("updating an existing ingredient to 0 works", async function () {
+    const groceryListId = await getGroceryListId();
+    await GroceryList.updateOrAddIngredient(groceryListId, removeZerodIngredient);
+    let groceryList = await GroceryList.get(groceryListId);
+    expect(groceryList.groceryList.ingredients.some(ingredient => ingredient.ingredientName === 'white rice')).toBe(false);
   });
 });
 

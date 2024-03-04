@@ -6,14 +6,17 @@ const { sqlForPartialUpdate } = require("../../helpers/sql");
 const { addIngredient, updateIngredient } = require("../../helpers/groceryListHelpers");
 
 
-/** Related functions for companies. */
+/** Related functions for grocery lists. */
 
 class GroceryList {
   /** Create a grocery list 
    *
-   * requires userId to create
+   * REQUIRED
    * @userId stored {here} when user is logged in
-   *
+   * 
+   * OPTIONAL
+   * @groceryListName user sent name for grocery list
+   * 
    * Returns { id: int, groceryListName: string, createdAt: string  }
    * 
    **/
@@ -30,13 +33,13 @@ class GroceryList {
         VALUES ($1)
         RETURNING id, grocery_list_name AS "groceryListName", created_at AS "createdAt"`
 
-    const variables =
+    const queryVariables =
       groceryListName ?
         [userId, groceryListName]
         :
         [userId]
 
-    const result = await db.query(queryString, variables);
+    const result = await db.query(queryString, queryVariables);
     let groceryList = result.rows[0];
 
     return groceryList;
@@ -44,7 +47,7 @@ class GroceryList {
 
   /** Find all grocery lists for a specific user.
    *
-   * requires userId to run
+   * REQUIRED
    * @userId stored {here} when user is logged in
    *
    * Returns list of grocery list objects [{ id: int, groceryListName: string, createdAt: date}, ...]
@@ -63,8 +66,11 @@ class GroceryList {
 
   /** Given a grocery list id, return data about grocery list.
    *
-   * Returns { id, title, salary, equity, companyHandle, company }
-   *   where company is { handle, name, description, numEmployees, logoUrl }
+   * REQUIRED
+   * @id a grocery list ID
+   * 
+   * Returns { id: int, createdAt: date, groceryListName: string/null }
+   *   where ingredients => [{ ingredientId: int, ingredientName: string, amount: string, unit: string (oz/fl oz) }, {ingredient}, ...]
    *
    * Throws NotFoundError if not found.
    **/
@@ -96,16 +102,23 @@ class GroceryList {
     return { groceryList: { ...groceryList, ingredients: ingredientList } };
   }
 
-  /** Update job data with `data`.
+  /** Update or add ignredient from/to grocery list.
    *
-   * This is a "partial update" --- it's fine if data doesn't contain
-   * all the fields; this only changes provided ones.
+   * This is method can either update or add an ingredient
+   * we check to see if the grocery list has the ingredient already in it
+   * if it does we update
+   * if it does not we add
    *
-   * Data can include: { title, salary, equity }
+   * REQUIRED
+   * @groceryListId the ID of the grocery list
+   * @ingredientData is a list of ingredients - must be at least 1 ingredient obj
+   * where @ingredientObj => { ingredientId: int, ingredientName: string, amount: int, unit: string, consistency: string (@SOLID OR @LIQUID) }
    *
-   * Returns { id, title, salary, equity, companyHandle }
-   *
-   * Throws NotFoundError if not found.
+   * Returns @addedIngredient or @updatedIngredient
+   * where @addedIngredient => { ingredientName: string, amount: string, unit: string (oz/fl oz) }
+   * where @updatedIngredient => { ingredientName: string, amount: string, unit: string (oz/fl oz) }
+   * 
+   * If the @updatedIngredient results in an amount of '0.00', we've removed it to the point where it is no longer needed, we remove it from the table
    */
 
   static async updateOrAddIngredient(groceryListId, ingredientData) {
@@ -115,10 +128,12 @@ class GroceryList {
     for (let ingredient of ingredientData.ingredients) {
       const { ingredientId, ingredientName, amount, unit, consistency } = ingredient;
       const isInList = ingredientList.some(ingredient => ingredient.ingredientId === ingredientId);
-      console.log(ingredient.ingredientName);
-      console.log(isInList)
       if (isInList) {
-        const updatedIngredient = await updateIngredient(groceryListId, ingredientId, amount, unit, consistency)
+        let updatedIngredient = await updateIngredient(groceryListId, ingredientId, amount, unit, consistency)
+        if (updatedIngredient.amount === '0.00') {
+          updatedIngredient = await GroceryList.removeIngredient(groceryListId, ingredientId);
+          return updatedIngredient;
+        }
         return updatedIngredient;
       } else {
         const addedIngredient = await addIngredient(groceryListId, ingredientId, ingredientName, amount, unit, consistency);
