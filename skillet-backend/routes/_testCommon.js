@@ -2,12 +2,15 @@
 
 const db = require("../db.js");
 const User = require("../models/user/user.js");
+const GroceryList = require("../models/groceryList/groceryList.js");
 const { createToken } = require("../helpers/tokens.js");
 
 
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM users");
+  // noinspection SqlWithoutWhere
+  await db.query("DELETE FROM grocery_lists")
 
   await User.register({
     username: "u1",
@@ -17,6 +20,7 @@ async function commonBeforeAll() {
     lastName: "U1L",
     isAdmin: false,
   });
+
   await User.register({
     username: "u2",
     email: "user2@user.com",
@@ -25,6 +29,7 @@ async function commonBeforeAll() {
     lastName: "U2L",
     isAdmin: false,
   });
+
   await User.register({
     username: "u3",
     email: "user3@user.com",

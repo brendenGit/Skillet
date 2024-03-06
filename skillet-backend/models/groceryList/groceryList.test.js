@@ -40,8 +40,7 @@ async function getGroceryListId() {
 
 describe("create", function () {
   test("works without grocery list title", async function () {
-    const userId = await getUserId("u1");
-    let goceryList = await GroceryList.create(userId);
+    let goceryList = await GroceryList.create('u1');
     expect(goceryList).toEqual({
       id: expect.any(Number),
       groceryListName: null,
@@ -50,9 +49,8 @@ describe("create", function () {
   });
 
   test("works with grocery list title", async function () {
-    const userId = await getUserId("u1");
     const groceryListName = "test grocery list";
-    let goceryList = await GroceryList.create(userId, groceryListName);
+    let goceryList = await GroceryList.create('u1', groceryListName);
     expect(goceryList).toEqual({
       id: expect.any(Number),
       groceryListName: "test grocery list",
@@ -65,36 +63,36 @@ describe("create", function () {
 
 describe("getGroceryLists", function () {
   test("works", async function () {
-    const userId = await getUserId("u1");
-    let groceryLists = await GroceryList.getGroceryLists(userId);
-    expect(groceryLists).toEqual([
-      {
-        id: expect.any(Number),
-        groceryListName: null,
-        createdAt: expect.any(Date)
-      },
-      {
-        id: expect.any(Number),
-        groceryListName: "test list 1",
-        createdAt: expect.any(Date)
-      },
-      {
-        id: expect.any(Number),
-        groceryListName: "test list 2",
-        createdAt: expect.any(Date)
-      },
-      {
-        id: expect.any(Number),
-        groceryListName: null,
-        createdAt: expect.any(Date)
-      },
-    ])
+    let groceryLists = await GroceryList.getGroceryLists('u1');
+    expect(groceryLists).toEqual({
+      groceryLists: [
+        {
+          id: expect.any(Number),
+          groceryListName: null,
+          createdAt: expect.any(Date)
+        },
+        {
+          id: expect.any(Number),
+          groceryListName: "test list 1",
+          createdAt: expect.any(Date)
+        },
+        {
+          id: expect.any(Number),
+          groceryListName: "test list 2",
+          createdAt: expect.any(Date)
+        },
+        {
+          id: expect.any(Number),
+          groceryListName: null,
+          createdAt: expect.any(Date)
+        },
+      ]
+    })
   });
 
   test("returns empty list if no lists in db", async function () {
-    const userId = await getUserId("u2");
-    let groceryLists = await GroceryList.getGroceryLists(userId);
-    expect(groceryLists).toEqual([])
+    let groceryLists = await GroceryList.getGroceryLists('u2');
+    expect(groceryLists).toEqual({ groceryLists: [] })
   });
 });
 

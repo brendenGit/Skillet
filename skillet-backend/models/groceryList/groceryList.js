@@ -12,7 +12,7 @@ class GroceryList {
   /** Create a grocery list 
    *
    * REQUIRED
-   * @userId stored {here} when user is logged in
+   * @username stored {here} when user is logged in
    * 
    * OPTIONAL
    * @groceryListName user sent name for grocery list
@@ -21,7 +21,7 @@ class GroceryList {
    * 
    **/
 
-  static async create(userId, groceryListName) {
+  static async create(username, groceryListName) {
     const queryString =
       groceryListName ?
         `INSERT INTO grocery_lists (created_by,
@@ -35,9 +35,9 @@ class GroceryList {
 
     const queryVariables =
       groceryListName ?
-        [userId, groceryListName]
+        [username, groceryListName]
         :
-        [userId]
+        [username]
 
     const result = await db.query(queryString, queryVariables);
     let groceryList = result.rows[0];
@@ -54,14 +54,14 @@ class GroceryList {
    * 
    * */
 
-  static async getGroceryLists(userId) {
+  static async getGroceryLists(username) {
     const groceryListsRes = await db.query(`SELECT id,
                                                   created_at as "createdAt",
                                                   grocery_list_name as "groceryListName"
                                             FROM grocery_lists 
                                             WHERE created_by = $1`,
-      [userId]);
-    return groceryListsRes.rows;
+      [username]);
+    return { groceryLists: groceryListsRes.rows };
   }
 
   /** Given a grocery list id, return data about grocery list.

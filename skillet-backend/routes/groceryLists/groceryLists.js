@@ -5,84 +5,63 @@
 const jsonschema = require("jsonschema");
 const express = require("express");
 
-const { BadRequestError } = require("../expressError.cjs");
-const { ensureAdmin } = require("../middleware/auth.cjs");
-const Company = require("../models/company.cjs");
+const { BadRequestError } = require("../../expressError.js");
+const { ensureCorrectUserOrAdmin, ensureAdmin } = require("../../middleware/auth.js");
+const GroceryList = require("../../models/groceryList/groceryList.js");
 
-const companyNewSchema = require("../../schemas/companyNew.json");
-const companyUpdateSchema = require("../schemas/companyUpdate.json");
-const companySearchSchema = require("../schemas/companySearch.json");
+const newGroceryListSchema = require("../../schemas/newGroceryList.json");
 
 const router = new express.Router();
 
 
-/** POST / { company } =>  { company }
+/** GET / groceryListId =>  { groceryList: { ...groceryList, ingredients: [ingredientList] } };
  *
- * company should be { handle, name, description, numEmployees, logoUrl }
+ * @groceryListId is an int value from DOM key
  *
- * Returns { handle, name, description, numEmployees, logoUrl }
+ * Returns  { groceryList: { ...groceryList, ingredients: [ingredientList] } }
  *
- * Authorization required: admin
+ * Authorization required: ensureCorrectUserOrAdmin
  */
 
-router.post("/", ensureAdmin, async function (req, res, next) {
+router.get("/:username/:groceryListId", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
-    const validator = jsonschema.validate(req.body, companyNewSchema);
-    if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
-      throw new BadRequestError(errs);
-    }
-
-    const company = await Company.create(req.body);
-    return res.status(201).json({ company });
+    const groceryList = await GroceryList.get(req.params.groceryListId);
+    return res.json(groceryList);
   } catch (err) {
     return next(err);
   }
 });
 
-/** GET /  =>
- *   { companies: [ { handle, name, description, numEmployees, logoUrl }, ...] }
+/** GET /  groceryLists => {groceryLists: [{groceryList}, {groceryList}, ...]}
+ *                where groceryList => { createdAt: String, groceryListName: String, id: Int }
  *
- * Can filter on provided search filters:
- * - minEmployees
- * - maxEmployees
- * - nameLike (will find case-insensitive, partial matches)
- *
- * Authorization required: none
+ * Authorization required: correct user or admin
  */
 
-router.get("/", async function (req, res, next) {
-  const q = req.query;
-  // arrive as strings from querystring, but we want as ints
-  if (q.minEmployees !== undefined) q.minEmployees = +q.minEmployees;
-  if (q.maxEmployees !== undefined) q.maxEmployees = +q.maxEmployees;
-
+router.get("/:username", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
-    const validator = jsonschema.validate(q, companySearchSchema);
-    if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
-      throw new BadRequestError(errs);
-    }
-
-    const companies = await Company.findAll(q);
-    return res.json({ companies });
+    const groceryLists = await GroceryList.getGroceryLists(req.params.username);
+    return res.json(groceryLists);
   } catch (err) {
     return next(err);
   }
 });
 
-/** GET /[handle]  =>  { company }
+/** POST /  groceryLists => {groceryLists: [{groceryList}, {groceryList}, ...]}
+ *                where groceryList => { createdAt: String, groceryListName: String, id: Int }
  *
- *  Company is { handle, name, description, numEmployees, logoUrl, jobs }
- *   where jobs is [{ id, title, salary, equity }, ...]
- *
- * Authorization required: none
+ * Authorization required: correct user or admin
  */
 
-router.get("/:handle", async function (req, res, next) {
+router.post("/:username/new", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
-    const company = await Company.get(req.params.handle);
-    return res.json({ company });
+    const validator = jsonschema.validate({ username: req.params.username, groceryListName: req.body.groceryListName || null }, newGroceryListSchema);
+    if (!validator.valid) {
+      const errs = validator.errors.map(e => e.stack);
+      throw new BadRequestError(errs);
+    }
+    const groceryList = await GroceryList.create(req.params.username, req.body.groceryListName || null);
+    return res.status(201).json({ groceryList: groceryList });
   } catch (err) {
     return next(err);
   }

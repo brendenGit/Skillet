@@ -27,7 +27,7 @@ CREATE TABLE recipe_rated_by (
 
 CREATE TABLE grocery_lists (
   id SERIAL PRIMARY KEY,
-  created_by INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+  created_by VARCHAR(50) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   grocery_list_name VARCHAR(255) DEFAULT NULL
 );

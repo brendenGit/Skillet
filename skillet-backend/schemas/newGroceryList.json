@@ -3,32 +3,19 @@
   "$id": "http://our.company.com/companyNew.schema.json",
   "type": "object",
   "properties": {
-    "name": {
+    "username": {
       "type": "string",
       "minLength": 1,
-      "maxLength": 30
+      "maxLength": 50
     },
-    "handle": {
+    "groceryListName": {
       "type": "string",
       "minLength": 1,
-      "maxLength": 10
-    },
-    "description": {
-      "type": "string"
-    },
-    "numEmployees": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "logoUrl": {
-      "type": "string",
-      "format": "uri"
+      "maxLength": 50
     }
   },
   "additionalProperties": false,
   "required": [
-    "name",
-    "handle",
-    "description"
+    "username"
   ]
 }

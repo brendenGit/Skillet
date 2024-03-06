@@ -9,7 +9,7 @@ async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM users");
 
-  const userIdRes = await db.query(`
+  await db.query(`
         INSERT INTO users(username,
                           email,
                           password,
@@ -24,14 +24,13 @@ async function commonBeforeAll() {
       await bcrypt.hash("password2", BCRYPT_WORK_FACTOR),
     ]);
 
-  const userId = userIdRes.rows[0].id;
   const glIdResawait = await db.query(`
         INSERT INTO grocery_lists(created_by,
                                   grocery_list_name)
-        VALUES (${userId}, null),
-               (${userId}, 'test list 1'),
-               (${userId}, 'test list 2'),
-               (${userId}, null)
+        VALUES ('u1', null),
+               ('u1', 'test list 1'),
+               ('u1', 'test list 2'),
+               ('u1', null)
         RETURNING id`);
 
   const groceryListId = glIdResawait.rows[0].id;

@@ -30,8 +30,8 @@ VALUES
 -- grocery_lists
 INSERT INTO grocery_lists (created_by, grocery_list_name)
 VALUES
- (1, 'Week of 2024-02-26'),
- (2, 'Party Snacks'); 
+ ('HungryCoder', 'Week of 2024-02-26'),
+ ('Foodie2023', 'Party Snacks'); 
 
 -- ingredient_in_grocery_list
 INSERT INTO ingredient_in_grocery_list (grocery_list_id, ingredient_id, ingredient_name, amount, unit)
