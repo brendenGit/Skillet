@@ -10,7 +10,8 @@ CREATE TABLE users (
 
 CREATE TABLE recipe_saved (
   recipe_id INTEGER NOT NULL,
-  saved_by INTEGER NOT NULL REFERENCES users ON DELETE CASCADE
+  saved_by VARCHAR(50) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
+  UNIQUE (recipe_id, saved_by)
 );
 
 CREATE TABLE recipe_stats (

@@ -9,9 +9,9 @@ VALUES
 -- recipe_saved
 INSERT INTO recipe_saved (recipe_id, saved_by)
 VALUES 
-  (1, 1),
-  (3, 1), 
-  (2, 2);
+  (1, 'HungryCoder'),
+  (3, 'HungryCoder'), 
+  (2, 'Foodie2023');
 
 -- recipe_stats
 INSERT INTO recipe_stats (recipe_id, rating, save_count)
@@ -20,11 +20,12 @@ VALUES
   (2, 3, 2),
   (3, 5, 1);
 
-
 -- recipe_rated_by
 INSERT INTO recipe_rated_by (recipe_id, rated_by)
 VALUES
+ (1, 1),
  (1, 2),
+ (1, 3),
  (2, 1); 
 
 -- grocery_lists

@@ -4,12 +4,15 @@ const db = require("../db.js");
 const { BCRYPT_WORK_FACTOR } = require("../config.js");
 
 async function commonBeforeAll() {
-  // noinspection SqlWithoutWhere
-  await db.query("DELETE FROM recipe_stats");
-  // noinspection SqlWithoutWhere
+  //clear tables
   await db.query("DELETE FROM users");
+  await db.query("DELETE FROM grocery_lists");
+  await db.query("DELETE FROM recipe_saved");
+  await db.query("DELETE FROM recipe_stats");
+  await db.query("DELETE FROM recipe_rated_by");
 
-  await db.query(`
+  //add users
+  const idsRes = await db.query(`
         INSERT INTO users(username,
                           email,
                           password,
@@ -23,6 +26,31 @@ async function commonBeforeAll() {
       await bcrypt.hash("password1", BCRYPT_WORK_FACTOR),
       await bcrypt.hash("password2", BCRYPT_WORK_FACTOR),
     ]);
+  const ids = idsRes.rows.map(obj => obj.id);
+
+  //add saved recipes
+  await db.query(`
+    INSERT INTO recipe_saved(recipe_id,
+                            saved_by)
+    VALUES (1, 'u1'),
+           (2, 'u1'),
+           (1, 'u2')`)
+
+  //add recipe stats
+  await db.query(`
+  INSERT INTO recipe_stats(recipe_id,
+                          rating,
+                          save_count)
+  VALUES (1, 4, 5),
+         (2, 3, 4)`)
+
+  //add recipe rated by rows
+  await db.query(`
+  INSERT INTO recipe_rated_by(recipe_id,
+                              rated_by)
+  VALUES  (1, ${ids[0]}),
+          (1, ${ids[1]}),
+          (2, ${ids[0]})`)
 
   const glIdResawait = await db.query(`
         INSERT INTO grocery_lists(created_by,
