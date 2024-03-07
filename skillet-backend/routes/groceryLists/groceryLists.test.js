@@ -152,7 +152,7 @@ describe("POST /grocery-lists/:username/new", function () {
 
 /************************************** PATCH /grocery-lists/:username/:groceryListId */
 
-describe("PATCH /companies/:handle", function () {
+describe("PATCH /grocery-lists/", function () {
   test("works for correct user adding multiple ingredients", async function () {
     const glRes = await GroceryList.create('u1', "Test Grocery List");
     const glId = glRes.id
@@ -160,7 +160,6 @@ describe("PATCH /companies/:handle", function () {
     const resp = await request(app)
       .patch(`/grocery-lists/u1/${glId}`)
       .send({
-        groceryListId: glId,
         ingredients: [
           {
             ingredientId: 1,
@@ -206,20 +205,47 @@ describe("PATCH /companies/:handle", function () {
     ]);
   });
 
-  test("works for correct user updating ingredients", async function () {
+  test("works for correct user adding a single ingredient", async function () {
     const glRes = await GroceryList.create('u1', "Test Grocery List");
     const glId = glRes.id
-
-    await GroceryList.updateOrAddIngredient(glId, [{ ingredientId: 1, ingredientName: 'white rice', amount: 1, unit: 'cup', consistency: 'SOLID'}])
 
     const resp = await request(app)
       .patch(`/grocery-lists/u1/${glId}`)
       .send({
-        groceryListId: glId,
         ingredients: [
           {
             ingredientId: 1,
             ingredientName: 'white rice',
+            amount: 2,
+            unit: 'cups',
+            consistency: 'SOLID'
+          }
+        ]
+      })
+      .set("authorization", `Bearer ${u1Token}`);
+
+    expect(resp.body).toEqual([
+      {
+        "amount": "16.00",
+        "ingredientName": "white rice",
+        "unit": "oz"
+      }
+    ]);
+  });
+
+  test("works for correct user updating a single ingredient", async function () {
+    const glRes = await GroceryList.create('u1', "Test Grocery List");
+    const glId = glRes.id
+
+    await GroceryList.updateOrAddIngredient(glId, { ingredients: [{ ingredientId: 1, ingredientName: 'white rice', amount: 1, unit: 'cup', consistency: 'SOLID' }] })
+
+    const resp = await request(app)
+      .patch(`/grocery-lists/u1/${glId}`)
+      .send({
+        ingredients: [
+          {
+            ingredientId: 1,
+            ingredientName: 'white rice test',
             amount: 2,
             unit: 'cups',
             consistency: 'SOLID'
@@ -237,33 +263,119 @@ describe("PATCH /companies/:handle", function () {
     ]);
   });
 
-  test("works for correct user updating multiple ingredients", async function () {
+  test("works for correct user updating a single ingredient causing zero remainder", async function () {
     const glRes = await GroceryList.create('u1', "Test Grocery List");
     const glId = glRes.id
 
-    ingredientData = [
-      { 
-        ingredientId: 1, 
-        ingredientName: 'white rice', 
-        amount: 1, 
-        unit: 'cup', 
-        consistency: 'SOLID'
-      },
-      { 
-        ingredientId: 2, 
-        ingredientName: 'soy sauce', 
-        amount: 1, 
-        unit: 'tbsp', 
-        consistency: 'LIQUID'
+    await GroceryList.updateOrAddIngredient(glId, { ingredients: [{ ingredientId: 1, ingredientName: 'white rice', amount: 1, unit: 'cup', consistency: 'SOLID' }] })
+
+    const resp = await request(app)
+      .patch(`/grocery-lists/u1/${glId}`)
+      .send({
+        ingredients: [
+          {
+            ingredientId: 1,
+            ingredientName: 'white rice test',
+            amount: -1,
+            unit: 'cups',
+            consistency: 'SOLID'
+          }
+        ]
+      })
+      .set("authorization", `Bearer ${u1Token}`);
+
+    expect(resp.body).toEqual([
+      {
+        "removed": "white rice"
       }
-    ]
+    ]);
+  });
+
+  test("works for correct user updating multiple ingredients causing zero remainder", async function () {
+    const glRes = await GroceryList.create('u1', "Test Grocery List");
+    const glId = glRes.id
+
+    const ingredientData = {
+      ingredients: [
+        {
+          ingredientId: 1,
+          ingredientName: 'white rice',
+          amount: 1,
+          unit: 'cup',
+          consistency: 'SOLID'
+        },
+        {
+          ingredientId: 2,
+          ingredientName: 'soy sauce',
+          amount: 1,
+          unit: 'tbsp',
+          consistency: 'LIQUID'
+        }
+      ]
+    }
 
     await GroceryList.updateOrAddIngredient(glId, ingredientData)
 
     const resp = await request(app)
       .patch(`/grocery-lists/u1/${glId}`)
       .send({
-        groceryListId: glId,
+        ingredients: [
+          {
+            ingredientId: 1,
+            ingredientName: 'white rice test',
+            amount: -1,
+            unit: 'cups',
+            consistency: 'SOLID'
+          },
+          {
+            ingredientId: 2,
+            ingredientName: 'soy sauce',
+            amount: -1,
+            unit: 'tbsp',
+            consistency: 'LIQUID'
+          }
+        ]
+      })
+      .set("authorization", `Bearer ${u1Token}`);
+
+    expect(resp.body).toEqual([
+      {
+        "removed": "white rice"
+      },
+      {
+        "removed": "soy sauce"
+      }
+    ]);
+  });
+
+  test("works for correct user updating multiple ingredients", async function () {
+    const glRes = await GroceryList.create('u1', "Test Grocery List");
+    const glId = glRes.id
+
+    const ingredientData = {
+      ingredients: [
+        {
+          ingredientId: 1,
+          ingredientName: 'white rice',
+          amount: 1,
+          unit: 'cup',
+          consistency: 'SOLID'
+        },
+        {
+          ingredientId: 2,
+          ingredientName: 'soy sauce',
+          amount: 1,
+          unit: 'tbsp',
+          consistency: 'LIQUID'
+        }
+      ]
+    }
+
+    await GroceryList.updateOrAddIngredient(glId, ingredientData)
+
+    const resp = await request(app)
+      .patch(`/grocery-lists/u1/${glId}`)
+      .send({
         ingredients: [
           {
             ingredientId: 1,
@@ -271,6 +383,13 @@ describe("PATCH /companies/:handle", function () {
             amount: 2,
             unit: 'cups',
             consistency: 'SOLID'
+          },
+          {
+            ingredientId: 2,
+            ingredientName: 'soy sauce',
+            amount: 2,
+            unit: 'tbsp',
+            consistency: 'LIQUID'
           }
         ]
       })
@@ -281,6 +400,11 @@ describe("PATCH /companies/:handle", function () {
         "amount": "24.00",
         "ingredientName": "white rice",
         "unit": "oz"
+      },
+      {
+        "amount": "1.50",
+        "ingredientName": "soy sauce",
+        "unit": "fl oz"
       }
     ]);
   });
@@ -292,7 +416,6 @@ describe("PATCH /companies/:handle", function () {
     const resp = await request(app)
       .patch(`/grocery-lists/u1/${glId}`)
       .send({
-        groceryListId: glId,
         ingredients: [
           {
             ingredientId: 1,
@@ -321,7 +444,6 @@ describe("PATCH /companies/:handle", function () {
     const resp = await request(app)
       .patch(`/grocery-lists/u1/${glId}`)
       .send({
-        groceryListId: glId,
         ingredients: [
           {
             ingredientId: 1,
@@ -342,55 +464,53 @@ describe("PATCH /companies/:handle", function () {
       .set("authorization", `Bearer ${u2Token}`);
     expect(resp.statusCode).toEqual(401);
   });
+});
 
-  // test("unauth for non-admin", async function () {
-  //   const resp = await request(app)
-  //     .patch(`/companies/c1`)
-  //     .send({
-  //       name: "C1-new",
-  //     })
-  //     .set("authorization", `Bearer ${u1Token}`);
-  //   expect(resp.statusCode).toEqual(401);
-  // });
+/************************************** DELETE /grocery-lists/:username/:groceryListId/ingredients/:ingredientId */
 
-  // test("unauth for anon", async function () {
-  //   const resp = await request(app)
-  //     .patch(`/companies/c1`)
-  //     .send({
-  //       name: "C1-new",
-  //     });
-  //   expect(resp.statusCode).toEqual(401);
-  // });
+describe("DELETE /grocery-lists/:username/:groceryListId/ingredients/:ingredientId", function () {
 
-  // test("not found on no such company", async function () {
-  //   const resp = await request(app)
-  //     .patch(`/companies/nope`)
-  //     .send({
-  //       name: "new nope",
-  //     })
-  //     .set("authorization", `Bearer ${adminToken}`);
-  //   expect(resp.statusCode).toEqual(404);
-  // });
+  test("works for correct user", async function () {
+    const glRes = await GroceryList.create('u1', "Test Grocery List");
+    const glId = glRes.id
 
-  // test("bad request on handle change attempt", async function () {
-  //   const resp = await request(app)
-  //     .patch(`/companies/c1`)
-  //     .send({
-  //       handle: "c1-new",
-  //     })
-  //     .set("authorization", `Bearer ${adminToken}`);
-  //   expect(resp.statusCode).toEqual(400);
-  // });
+    await GroceryList.updateOrAddIngredient(glId, { ingredients: [{ ingredientId: 1, ingredientName: 'white rice', amount: 1, unit: 'cup', consistency: 'SOLID' }] })
 
-  // test("bad request on invalid data", async function () {
-  //   const resp = await request(app)
-  //     .patch(`/companies/c1`)
-  //     .send({
-  //       logoUrl: "not-a-url",
-  //     })
-  //     .set("authorization", `Bearer ${adminToken}`);
-  //   expect(resp.statusCode).toEqual(400);
-  // });
+    const resp = await request(app)
+      .delete(`/grocery-lists/u1/${glId}/ingredients/1`)
+      .set("authorization", `Bearer ${u1Token}`);
+
+    expect(resp.body).toEqual(
+      {
+        "removed": "white rice"
+      }
+    );
+  });
+
+  test("auth for not correct user but IS admin", async function () {
+    const glRes = await GroceryList.create('u1', "Test Grocery List");
+    const glId = glRes.id
+
+    await GroceryList.updateOrAddIngredient(glId, { ingredients: [{ ingredientId: 1, ingredientName: 'white rice', amount: 1, unit: 'cup', consistency: 'SOLID' }] })
+
+    const resp = await request(app)
+      .delete(`/grocery-lists/u1/${glId}/ingredients/1`)
+      .set("authorization", `Bearer ${adminToken}`);
+
+    expect(resp.statusCode).toEqual(200);
+  });
+
+  test("unauth for non-admin and NOT correct user", async function () {
+    const glRes = await GroceryList.create('u1', "Test Grocery List");
+    const glId = glRes.id
+
+    await GroceryList.updateOrAddIngredient(glId, { ingredients: [{ ingredientId: 1, ingredientName: 'white rice', amount: 1, unit: 'cup', consistency: 'SOLID' }] })
+
+    const resp = await request(app)
+      .delete(`/grocery-lists/u1/${glId}/ingredients/1`)
+      .set("authorization", `Bearer ${u2Token}`);
+    expect(resp.statusCode).toEqual(401);
+  });
 });
 
 /************************************** DELETE /grocery-lists/:username/:groceryListId */

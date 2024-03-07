@@ -76,16 +76,29 @@ router.post("/:username/new", ensureCorrectUserOrAdmin, async function (req, res
  */
 
 router.patch("/:username/:groceryListId", ensureCorrectUserOrAdmin, async function (req, res, next) {
-  console.log({ groceryListId: req.params.groceryListId, ...req.body });
   try {
-    const validator = jsonschema.validate({ groceryListId: req.params.groceryListId, ...req.body }, updateGroceryListSchema);
+    const validator = jsonschema.validate({ groceryListId: parseInt(req.params.groceryListId), ...req.body }, updateGroceryListSchema);
     if (!validator.valid) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
 
-    const ingredients = await GroceryList.updateOrAddIngredient(req.params.groceryListId, req.body);
+    const ingredients = await GroceryList.updateOrAddIngredient(parseInt(req.params.groceryListId), req.body);
     return res.json(ingredients);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** DELETE /:username/:groceryListId/ingredients/:ingredientId  =>  { deleted: "deleted grocery list" }
+ *
+ * Authorization: correct user or admin
+ */
+
+router.delete("/:username/:groceryListId/ingredients/:ingredientId", ensureCorrectUserOrAdmin, async function (req, res, next) {
+  try {
+    const removedIngredient = await GroceryList.removeIngredient(req.params.groceryListId, req.params.ingredientId);
+    return res.json({ removed: removedIngredient });
   } catch (err) {
     return next(err);
   }
