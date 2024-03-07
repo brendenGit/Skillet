@@ -86,7 +86,7 @@ describe("addIngredient", function () {
     test("prompts custom add if conversion was unsuccesful", async function () {
         const groceryListId = await getGroceryListId();
         const addedIngredient = await addIngredient(groceryListId, 1, 'white rice', 2, '', "SOLID")
-        expect(addedIngredient).toEqual('custom conversion required');
+        expect(addedIngredient).toEqual({ "customConversionRequired": "white rice" });
     });
 });
 
@@ -108,7 +108,7 @@ describe("updateIngredient", function () {
     test("prompts custom update if conversion was unsuccesful", async function () {
         const groceryListId = await getGroceryListId();
         await addIngredient(groceryListId, 1, 2, 'cups', "SOLID")
-        const updatedIngredient = await updateIngredient(groceryListId, 1, 2, 'cupss', "SOLID")
-        expect(updatedIngredient).toEqual('custom conversion required');
+        const updatedIngredient = await updateIngredient(groceryListId, 1, 2, 'cupss', "SOLID", 'white rice')
+        expect(updatedIngredient).toEqual({ "customConversionRequired": "white rice" });
     });
 });

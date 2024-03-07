@@ -136,6 +136,7 @@ describe("GET /users/:username", function () {
       user: {
         username: "u1",
         firstName: "U1F",
+        id: expect.any(Number),
         lastName: "U1L",
         email: "user1@user.com"
       },
@@ -150,6 +151,7 @@ describe("GET /users/:username", function () {
       user: {
         username: "u1",
         firstName: "U1F",
+        id: expect.any(Number),
         lastName: "U1L",
         email: "user1@user.com"
       },

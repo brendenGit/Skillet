@@ -28,7 +28,7 @@ async function commonBeforeAll() {
   await db.query(`
         INSERT INTO grocery_lists(created_by,
                                   grocery_list_name)
-        VALUES (${userId}, null)
+        VALUES ('u1', null)
         RETURNING id`);
 }
 

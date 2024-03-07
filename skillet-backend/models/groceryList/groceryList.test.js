@@ -165,22 +165,22 @@ describe("updateOrAddIngredient", function () {
     const groceryListId = await getGroceryListId();
     const addedIngredient = await GroceryList.updateOrAddIngredient(groceryListId, ingredientsAdd);
     const groceryList = await GroceryList.get(groceryListId);
-    expect(addedIngredient).toEqual({
+    expect(addedIngredient).toEqual([{
       ingredientName: "flour",
       amount: "16.00",
       unit: "oz"
-    });
+    }]);
     expect(groceryList.groceryList.ingredients.some(ingredient => ingredient.ingredientName === "flour")).toBe(true);
   });
 
   test("adding an existing ingredient works", async function () {
     const groceryListId = await getGroceryListId();
     const updatedIngredient = await GroceryList.updateOrAddIngredient(groceryListId, ingredientsAddExisting);
-    expect(updatedIngredient).toEqual({
+    expect(updatedIngredient).toEqual([{
       amount: "32.00",
       ingredientName: "white rice",
       unit: "oz"
-    });
+    }]);
   });
 
   test("updating an existing ingredient to 0 works", async function () {
@@ -197,15 +197,13 @@ describe("removeIngredient", function () {
   test("works", async function () {
     const groceryListId = await getGroceryListId();
     const res = await GroceryList.removeIngredient(groceryListId, 1);
-    expect(res).toEqual({
-      removed: { ingredientName: 'white rice' }
-    });
+    expect(res).toEqual('white rice');
   });
 
   test("not found if no such ingredient", async function () {
     try {
       const groceryListId = await getGroceryListId();
-      await GroceryList.removeIngredient(groceryListId, 0);
+      await GroceryList.removeIngredient(groceryListId, 50);
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();

@@ -181,7 +181,7 @@ async function addIngredient(groceryListId, ingredientId, ingredientName, amount
 
 /************************************** update ingredient */
 
-async function updateIngredient(groceryListId, ingredientId, amount, unit, consistency) {
+async function updateIngredient(groceryListId, ingredientId, amount, unit, consistency, ingredientName) {
     const { convertedAmount } = convertToOunces(amount, unit, consistency);
     if (convertedAmount) {
         const result = await db.query(

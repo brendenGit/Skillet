@@ -130,7 +130,7 @@ class GroceryList {
       const { ingredientId, ingredientName, amount, unit, consistency } = ingredient;
       const isInList = ingredientList.some(ingredient => ingredient.ingredientId === ingredientId);
       if (isInList) {
-        let updatedIngredient = await updateIngredient(groceryListId, ingredientId, amount, unit, consistency)
+        let updatedIngredient = await updateIngredient(groceryListId, ingredientId, amount, unit, consistency, ingredientName)
         if (updatedIngredient.amount === '0.00') {
           updatedIngredient = await GroceryList.removeIngredient(groceryListId, ingredientId);
           returnedIngredients.push({ removed: updatedIngredient });
@@ -156,9 +156,9 @@ class GroceryList {
       FROM ingredient_in_grocery_list
       WHERE grocery_list_id = $1 AND ingredient_id = $2
       RETURNING ingredient_name AS "ingredientName"`, [groceryListId, ingredientId]);
-    const removedIngredient = result.rows[0].ingredientName;
 
-    if (!removedIngredient) throw new NotFoundError(`No such ingredient in grocery list`);
+    if (result.rows.length === 0) throw new NotFoundError(`No such ingredient in grocery list`);
+    const removedIngredient = result.rows[0].ingredientName;
 
     return removedIngredient;
   }
