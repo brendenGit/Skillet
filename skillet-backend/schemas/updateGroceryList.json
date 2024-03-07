@@ -1,0 +1,50 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "properties": {
+        "groceryListId": {
+            "type": "integer"
+        },
+        "ingredients": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "ingredientId": {
+                        "type": "integer"
+                    },
+                    "ingredientName": {
+                        "type": "string"
+                    },
+                    "amount": {
+                        "type": "integer"
+                    },
+                    "unit": {
+                        "type": "string"
+                    },
+                    "consistency": {
+                        "type": "string",
+                        "enum": [
+                            "SOLID",
+                            "LIQUID"
+                        ]
+                    }
+                },
+                "required": [
+                    "ingredientId",
+                    "ingredientName",
+                    "amount",
+                    "unit",
+                    "consistency"
+                ]
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "groceryListId",
+        "ingredients"
+    ]
+}

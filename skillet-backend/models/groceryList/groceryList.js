@@ -124,6 +124,7 @@ class GroceryList {
   static async updateOrAddIngredient(groceryListId, ingredientData) {
     const groceryList = await GroceryList.get(groceryListId);
     const ingredientList = groceryList.groceryList.ingredients;
+    const returnedIngredients = [];
 
     for (let ingredient of ingredientData.ingredients) {
       const { ingredientId, ingredientName, amount, unit, consistency } = ingredient;
@@ -132,14 +133,14 @@ class GroceryList {
         let updatedIngredient = await updateIngredient(groceryListId, ingredientId, amount, unit, consistency)
         if (updatedIngredient.amount === '0.00') {
           updatedIngredient = await GroceryList.removeIngredient(groceryListId, ingredientId);
-          return updatedIngredient;
         }
-        return updatedIngredient;
+        returnedIngredients.push(updatedIngredient);
       } else {
         const addedIngredient = await addIngredient(groceryListId, ingredientId, ingredientName, amount, unit, consistency);
-        return addedIngredient;
+        returnedIngredients.push(addedIngredient);
       }
     }
+    return returnedIngredients;
   }
 
   /** Delete given ingredient from grocery list.

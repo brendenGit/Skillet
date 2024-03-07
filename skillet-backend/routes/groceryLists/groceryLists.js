@@ -10,6 +10,7 @@ const { ensureCorrectUserOrAdmin, ensureAdmin } = require("../../middleware/auth
 const GroceryList = require("../../models/groceryList/groceryList.js");
 
 const newGroceryListSchema = require("../../schemas/newGroceryList.json");
+const updateGroceryListSchema = require("../../schemas/updateGroceryList.json");
 
 const router = new express.Router();
 
@@ -67,41 +68,38 @@ router.post("/:username/new", ensureCorrectUserOrAdmin, async function (req, res
   }
 });
 
-/** PATCH /[handle] { fld1, fld2, ... } => { company }
+/** PATCH /grocery-lists/:username/:groceryListId (groceryListId, [ingredients]) => {[added/updated ingredients]}
  *
- * Patches company data.
+ * Patches grocery list ingredients.
  *
- * fields can be: { name, description, numEmployees, logo_url }
- *
- * Returns { handle, name, description, numEmployees, logo_url }
- *
- * Authorization required: admin
+ * Authorization required: correct user or admin
  */
 
-router.patch("/:handle", ensureAdmin, async function (req, res, next) {
+router.patch("/:username/:groceryListId", ensureCorrectUserOrAdmin, async function (req, res, next) {
+  console.log({ groceryListId: req.params.groceryListId, ...req.body });
   try {
-    const validator = jsonschema.validate(req.body, companyUpdateSchema);
+    const validator = jsonschema.validate({ groceryListId: req.params.groceryListId, ...req.body }, updateGroceryListSchema);
     if (!validator.valid) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
 
-    const company = await Company.update(req.params.handle, req.body);
-    return res.json({ company });
+    const ingredients = await GroceryList.updateOrAddIngredient(req.params.groceryListId, req.body);
+    return res.json(ingredients);
   } catch (err) {
     return next(err);
   }
 });
 
-/** DELETE /[handle]  =>  { deleted: handle }
+/** DELETE /:username/:groceryListId  =>  { deleted: "deleted grocery list" }
  *
- * Authorization: admin
+ * Authorization: correct user or admin
  */
 
-router.delete("/:handle", ensureAdmin, async function (req, res, next) {
+router.delete("/:username/:groceryListId", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
-    await Company.remove(req.params.handle);
-    return res.json({ deleted: req.params.handle });
+    await GroceryList.remove(req.params.groceryListId);
+    return res.json({ success: "deleted grocery list" });
   } catch (err) {
     return next(err);
   }

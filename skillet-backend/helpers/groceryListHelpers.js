@@ -175,7 +175,7 @@ async function addIngredient(groceryListId, ingredientId, ingredientName, amount
             [groceryListId, ingredientId, ingredientName, convertedAmount, convertedUnit]);
         return result.rows[0];
     } else {
-        return 'custom conversion required';
+        return { customConversionRequired: ingredientName };
     }
 }
 
@@ -192,7 +192,7 @@ async function updateIngredient(groceryListId, ingredientId, amount, unit, consi
             [convertedAmount, groceryListId, ingredientId]);
         return result.rows[0];
     } else {
-        return 'custom conversion required';
+        return { customConversionRequired: ingredientName };
     }
 }
 
