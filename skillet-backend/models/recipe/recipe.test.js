@@ -2,8 +2,6 @@
 
 const {
   NotFoundError,
-  BadRequestError,
-  UnauthorizedError,
 } = require("../../expressError.js");
 const db = require("../../db.js");
 const Recipe = require("./recipe.js");
@@ -11,8 +9,7 @@ const {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
-  commonAfterAll,
-  testJobIds,
+  commonAfterAll
 } = require("../_testCommon.js");
 
 beforeAll(commonBeforeAll);
@@ -153,79 +150,3 @@ describe("updateRating", function () {
     expect(rating).toEqual(2);
   });
 });
-
-// /************************************** update */
-
-// describe("update", function () {
-//   const updateData = {
-//     firstName: "NewF",
-//     lastName: "NewF",
-//     email: "new@email.com",
-//     isAdmin: true,
-//   };
-
-//   test("works", async function () {
-//     let job = await User.update("u1", updateData);
-//     expect(job).toEqual({
-//       username: "u1",
-//       ...updateData,
-//     });
-//   });
-
-//   test("works: set password", async function () {
-//     let job = await User.update("u1", {
-//       password: "new",
-//     });
-//     expect(job).toEqual({
-//       username: "u1",
-//       firstName: "U1F",
-//       lastName: "U1L",
-//       email: "u1@email.com",
-//       isAdmin: false,
-//     });
-//     const found = await db.query("SELECT * FROM users WHERE username = 'u1'");
-//     expect(found.rows.length).toEqual(1);
-//     expect(found.rows[0].password.startsWith("$2b$")).toEqual(true);
-//   });
-
-//   test("not found if no such user", async function () {
-//     try {
-//       await User.update("nope", {
-//         firstName: "test",
-//       });
-//       fail();
-//     } catch (err) {
-//       expect(err instanceof NotFoundError).toBeTruthy();
-//     }
-//   });
-
-//   test("bad request if no data", async function () {
-//     expect.assertions(1);
-//     try {
-//       await User.update("c1", {});
-//       fail();
-//     } catch (err) {
-//       expect(err instanceof BadRequestError).toBeTruthy();
-//     }
-//   });
-// });
-
-// /************************************** remove */
-
-// describe("remove", function () {
-//   test("works", async function () {
-//     await User.remove("u1");
-//     const res = await db.query(
-//         "SELECT * FROM users WHERE username='u1'");
-//     expect(res.rows.length).toEqual(0);
-//   });
-
-//   test("not found if no such user", async function () {
-//     try {
-//       await User.remove("nope");
-//       fail();
-//     } catch (err) {
-//       expect(err instanceof NotFoundError).toBeTruthy();
-//     }
-//   });
-// });
