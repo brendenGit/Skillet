@@ -35,6 +35,30 @@ describe("getSaved", function () {
   });
 });
 
+/************************************** getRated */
+
+describe("getRated", function () {
+  test("works", async function () {
+    const recipes = await Recipe.getRated("u1");
+    if (recipes.length === 0) {
+      expect(recipes).toEqual([]);
+    } else {
+      expect(recipes).toEqual(expect.arrayContaining(
+        recipes.map((item) => expect.any(Number))
+      ));
+    }
+  });
+});
+
+/************************************** getStats */
+
+describe("getStats", function () {
+  test("works", async function () {
+    const recipes = await Recipe.getStats("1");
+    expect(recipes).toEqual({ "rating": 4, "recipeId": 1, "saveCount": 5 });
+  });
+});
+
 /************************************** createStats */
 
 describe("createStats", function () {
@@ -58,6 +82,24 @@ describe("save", function () {
 
   test("fails if recipe is already saved", async function () {
     await expect(Recipe.save(1, 'u1')).rejects.toThrow();
+  });
+});
+
+/************************************** rate */
+
+describe("rate", function () {
+  test("works", async function () {
+    let ratedRecipe = await Recipe.rate(3, 'u1', 5);
+    expect(ratedRecipe).toEqual({ "newRating": 5, "ratedRecipeId": 3 });
+  });
+
+  test("works for exsisting stats but not yet rated by user", async function () {
+    let ratedRecipe = await Recipe.rate(2, 'u2', 5);
+    expect(ratedRecipe).toEqual({ "newRating": 4, "ratedRecipeId": 2 });
+  });
+
+  test("fails if recipe is already rated", async function () {
+    await expect(Recipe.rate(1, 'u1')).rejects.toThrow();
   });
 });
 
@@ -100,21 +142,16 @@ describe("updateCount", function () {
 
 /************************************** updateRating */
 
-describe("updateCount", function () {
+describe("updateRating", function () {
   test("works with exsisting stats", async function () {
     let rating = await Recipe.updateRating(1, 2);
-    expect(rating).toEqual({ "saveCount": 6 });
+    expect(rating).toEqual(4);
   });
 
-  // test("works with no exsisting stats", async function () {
-  //   let saveCount = await Recipe.updateCount(50, +1);
-  //   expect(saveCount).toEqual({ "saveCount": 1 });
-  // });
-
-  // test("works with negative number", async function () {
-  //   let saveCount = await Recipe.updateCount(1, -1);
-  //   expect(saveCount).toEqual({ "saveCount": 4 });
-  // });
+  test("works with no exsisting stats", async function () {
+    let rating = await Recipe.updateRating(50, 2);
+    expect(rating).toEqual(2);
+  });
 });
 
 // /************************************** update */

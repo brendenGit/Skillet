@@ -48,9 +48,9 @@ async function commonBeforeAll() {
   await db.query(`
   INSERT INTO recipe_rated_by(recipe_id,
                               rated_by)
-  VALUES  (1, ${ids[0]}),
-          (1, ${ids[1]}),
-          (2, ${ids[0]})`)
+  VALUES  (1, 'u1'),
+          (1, 'u2'),
+          (2, 'u1')`)
 
   const glIdResawait = await db.query(`
         INSERT INTO grocery_lists(created_by,

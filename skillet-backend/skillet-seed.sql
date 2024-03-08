@@ -23,10 +23,10 @@ VALUES
 -- recipe_rated_by
 INSERT INTO recipe_rated_by (recipe_id, rated_by)
 VALUES
- (1, 1),
- (1, 2),
- (1, 3),
- (2, 1); 
+ (1, 'HungryCoder'),
+ (1, 'Foodie2023'),
+ (1, 'SpiceLover'),
+ (2, 'HungryCoder'); 
 
 -- grocery_lists
 INSERT INTO grocery_lists (created_by, grocery_list_name)

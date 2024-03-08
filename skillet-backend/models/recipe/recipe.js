@@ -36,6 +36,27 @@ class Recipe {
     return savedRecipes;
   }
 
+  /** gets a list of rated recipes for a user.
+   * 
+   * Returns [recipeId, recipeId, ...]
+   * @recipeId is a Number
+   *
+   * This can return an empty list if the user has not saved any recipes
+   */
+
+  static async getRated(username) {
+    const res = await db.query(
+      `SELECT recipe_id AS "recipeId"
+      FROM recipe_rated_by
+      WHERE rated_by = $1`,
+      [username],
+    );
+
+    const ratedRecipes = res.rows.map(recipe => recipe.recipeId);
+
+    return ratedRecipes;
+  }
+
   /** create a row for a new recipe id
    * 
    * @recipeId is a Number
@@ -73,9 +94,9 @@ class Recipe {
       [recipeId],
     );
 
-    const savedRecipes = res.rows.map(recipe => recipe.recipeId);
+    const recipeStats = res.rows[0];
 
-    return savedRecipes;
+    return recipeStats;
   }
 
   /** updates the count of a saved recipe 
@@ -96,7 +117,7 @@ class Recipe {
       [recipeId]
     );
     const noStats = exsistsRes.rows.length === 0;
-    if(noStats) this.createStats(recipeId);
+    if (noStats) this.createStats(recipeId);
 
     const res = await db.query(
       `UPDATE recipe_stats
@@ -122,34 +143,44 @@ class Recipe {
    */
 
   static async updateRating(recipeId, rating) {
+    let currentRating;
+    let newRating;
+
     const exsistsRes = await db.query(
       `SELECT recipe_id AS "recipeId", rating
       FROM recipe_stats
       WHERE recipe_id = $1`,
       [recipeId]
     );
-
-    const stats = exsistsRes.rows[0];
-    let currentRating;
-
-    if(stats.length ===0 ) {
+    
+    // if we have no stats - create them and set the new rating to the rating passed in
+    if (exsistsRes.rows.length === 0) {
       this.createStats(recipeId);
-      currentRating = stats.rating;
+      const res = await db.query(
+        `UPDATE recipe_stats
+          SET rating = $2
+          WHERE recipe_id = $1
+          RETURNING rating`,
+        [recipeId, rating],
+      );
+      newRating = res.rows[0].rating;
+      return newRating
     } else {
-      currentRating = 0;
+      currentRating = exsistsRes.rows[0].rating;
     }
 
     const currRatedCountRes = await db.query(
-      `SELECT recipe_id, COUNT(*) AS rating_count
+      `SELECT COUNT(*) AS "ratingCount"
       FROM recipe_rated_by
-      GROUP BY $1`,
+      WHERE recipe_id = $1`,
       [recipeId]
     );
 
-    let currRatedCount = currRatedCountRes.rows[0];
+    //calc new average
+    let currRatedCount = parseInt(currRatedCountRes.rows[0].ratingCount);
     const sumOfRatings = (currentRating * currRatedCount) + rating;
     currRatedCount += 1;
-    const newAverageRating = sumOfRatings / currRatedCount;
+    const newAverageRating = Math.ceil(sumOfRatings / currRatedCount);
 
     const res = await db.query(
       `UPDATE recipe_stats
@@ -159,14 +190,38 @@ class Recipe {
       [recipeId, newAverageRating],
     );
 
-    const newRating = res.rows[0];
-
+    newRating = res.rows[0].rating;
     return newRating;
+  }
+
+  /** rates a recipe.
+   *
+   * Returns { recipeId: Number, newRating: Number }
+   * creates new entry on recipe_rated_by table and updates rating
+   *
+   * Throws error if recipe already is already rated.
+   */
+
+  static async rate(recipeId, username, value) {
+    const res = await db.query(
+      `INSERT INTO recipe_rated_by (recipe_id, rated_by)
+      VALUES ($1, $2)
+      RETURNING recipe_id AS "recipeId"`,
+      [recipeId, username]
+    );
+
+    const ratedRecipeId = res.rows[0].recipeId;
+
+    if (!ratedRecipeId) throw new NotFoundError(`Error rating recipe with id, ${recipeId}.`);
+
+    const newRating = await this.updateRating(recipeId, value);
+
+    return { ratedRecipeId , newRating };
   }
 
   /** saves a recipeId to recipe_saved table.
    *
-   * Returns { recipe_id: Number }
+   * Returns { recipeId: Number }
    * increments the recipes saveCount inside of recipe_stats
    *
    * Throws error if recipe already saved.

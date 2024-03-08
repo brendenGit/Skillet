@@ -22,7 +22,7 @@ CREATE TABLE recipe_stats (
 
 CREATE TABLE recipe_rated_by (
   recipe_id INTEGER NOT NULL,
-  rated_by INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+  rated_by VARCHAR(50) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
   UNIQUE (recipe_id, rated_by)
 );
 
