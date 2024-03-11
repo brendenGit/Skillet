@@ -193,7 +193,6 @@ class Recipe {
    */
 
   static async rate(recipeId, username, rating) {
-    console.log(rating);
     const checkIfExists = await db.query(
       `SELECT recipe_id, rated_by
        FROM recipe_rated_by

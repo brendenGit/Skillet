@@ -92,12 +92,12 @@ describe("save", function () {
 describe("rate", function () {
   test("works", async function () {
     let ratedRecipe = await Recipe.rate(2, 'u2', 5);
-    expect(ratedRecipe).toEqual({ "newRating": 4, "ratedRecipeId": 2 });
+    expect(ratedRecipe).toEqual({ "newRating": 4, "recipeId": 2 });
   });
 
   test("works for exsisting stats but not yet rated by user", async function () {
     let ratedRecipe = await Recipe.rate(2, 'u2', 5);
-    expect(ratedRecipe).toEqual({ "newRating": 4, "ratedRecipeId": 2 });
+    expect(ratedRecipe).toEqual({ "newRating": 4, "recipeId": 2 });
   });
 
   test("fails if recipe is already rated", async function () {

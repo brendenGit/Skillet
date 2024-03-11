@@ -66,16 +66,22 @@ function normalizeUnit(unit) {
         case 'gallon':
         case 'gallons':
             return 'gal';
+        case "":
+            return 'whole';
         default:
             return null; // Invalid unit or whole unit
     }
 }
 
 function convertToOunces(amount, unit, consistency) {
-    unit = normalizeUnit(unit);
+    const normalizedUnit = normalizeUnit(unit);
     const nullResult = { "convertedAmount": null, "convertedUnit": null }
-    if (!unit) {
+    if (!normalizedUnit) {
         return nullResult;
+    }
+
+    if (normalizedUnit === "" && consistency === 'SOLID') {
+        return { convertedAmount: amount, convertedUnit: convertedUnit }
     }
 
     let conversionFactor;
@@ -83,7 +89,7 @@ function convertToOunces(amount, unit, consistency) {
 
     if (consistency === "SOLID") {
         convertedUnit = 'oz';
-        switch (unit) {
+        switch (normalizedUnit) {
             case 'oz':
                 conversionFactor = 1;
                 break;
@@ -116,7 +122,7 @@ function convertToOunces(amount, unit, consistency) {
         }
     } else if (consistency === "LIQUID") {
         convertedUnit = 'fl oz';
-        switch (unit) {
+        switch (normalizedUnit) {
             case 'fl oz':
                 conversionFactor = 1;
                 break;
