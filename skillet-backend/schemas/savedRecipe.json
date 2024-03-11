@@ -1,0 +1,20 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://www.skillet.com/newSavedRecipe.schema.json",
+    "type": "object",
+    "properties": {
+        "recipeId": {
+            "type": "integer"
+        },
+        "username": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "recipeId",
+        "username"
+    ]
+}

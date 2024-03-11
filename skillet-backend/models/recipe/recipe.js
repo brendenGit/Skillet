@@ -3,6 +3,7 @@
 const db = require("../../db.js");
 const {
   NotFoundError,
+  BadRequestError
 } = require("../../expressError.js");
 
 /** Related functions for recipes. */
@@ -70,12 +71,12 @@ class Recipe {
     return newStats;
   }
 
-  /** gets a list of saved recipes for a user.
+  /** gets stats of a specific recipe.
    * 
-   * Returns [recipeId, recipeId, ...]
+   * Returns { rating: Int, recipeId: Int, saveCount: Int }
    * @recipeId is a Number
-   *
-   * This can return an empty list if the user has not saved any recipes
+   * 
+   * if no stats are returned create them
    */
 
   static async getStats(recipeId) {
@@ -88,8 +89,13 @@ class Recipe {
       [recipeId],
     );
 
-    const recipeStats = res.rows[0];
+    // if no stats are returned create them
+    if (res.rows.length === 0) {
+      const newRecipeStats = await this.createStats(recipeId);
+      return newRecipeStats;
+    }
 
+    const recipeStats = res.rows[0];
     return recipeStats;
   }
 
@@ -100,19 +106,10 @@ class Recipe {
    * @value is either +1 or -1
    *
    * This handles both incrementing and decrementing
-   * if no stats are available we create a new entry in recipe_stats before we update
+   * When this method is called stats should have already been created
    */
 
   static async updateCount(recipeId, value) {
-    const exsistsRes = await db.query(
-      `SELECT recipe_id AS "recipeId"
-      FROM recipe_stats
-      WHERE recipe_id = $1`,
-      [recipeId]
-    );
-    const noStats = exsistsRes.rows.length === 0;
-    if (noStats) this.createStats(recipeId);
-
     const res = await db.query(
       `UPDATE recipe_stats
       SET save_count = save_count + $2
@@ -133,23 +130,22 @@ class Recipe {
    * @value is either +1 or -1
    *
    * This handles both incrementing and decrementing
-   * if no stats are available we create a new entry in recipe_stats before we update
+   * When this method is called stats should have already been created
    */
 
   static async updateRating(recipeId, rating) {
-    let currentRating;
-    let newRating;
+    let currentRating = 0;
+    let newRating = 0;
 
-    const exsistsRes = await db.query(
+    const statsRes = await db.query(
       `SELECT recipe_id AS "recipeId", rating
       FROM recipe_stats
       WHERE recipe_id = $1`,
       [recipeId]
     );
-    
-    // if we have no stats - create them and set the new rating to the rating passed in
-    if (exsistsRes.rows.length === 0) {
-      this.createStats(recipeId);
+
+    // if this is the first rating
+    if (statsRes.rows[0].rating === 0) {
       const res = await db.query(
         `UPDATE recipe_stats
           SET rating = $2
@@ -158,10 +154,10 @@ class Recipe {
         [recipeId, rating],
       );
       newRating = res.rows[0].rating;
-      return newRating
-    } else {
-      currentRating = exsistsRes.rows[0].rating;
+      return newRating;
     }
+
+    currentRating = statsRes.rows[0].rating;
 
     const currRatedCountRes = await db.query(
       `SELECT COUNT(*) AS "ratingCount"
@@ -196,21 +192,29 @@ class Recipe {
    * Throws error if recipe already is already rated.
    */
 
-  static async rate(recipeId, username, value) {
-    const res = await db.query(
-      `INSERT INTO recipe_rated_by (recipe_id, rated_by)
-      VALUES ($1, $2)
-      RETURNING recipe_id AS "recipeId"`,
+  static async rate(recipeId, username, rating) {
+    console.log(rating);
+    const checkIfExists = await db.query(
+      `SELECT recipe_id, rated_by
+       FROM recipe_rated_by
+       WHERE recipe_id = $1 AND rated_by = $2`,
       [recipeId, username]
     );
+    
+    if (checkIfExists.rows.length === 0) {
+      await db.query(
+        `INSERT INTO recipe_rated_by (recipe_id, rated_by)
+         VALUES ($1, $2)
+         RETURNING recipe_id AS "recipeId"`,
+        [recipeId, username]
+      );
+    } else {
+      throw new BadRequestError(`Error rating recipe with id, ${recipeId}.`)
+    }
 
-    const ratedRecipeId = res.rows[0].recipeId;
+    const newRating = await this.updateRating(recipeId, rating);
 
-    if (!ratedRecipeId) throw new NotFoundError(`Error rating recipe with id, ${recipeId}.`);
-
-    const newRating = await this.updateRating(recipeId, value);
-
-    return { ratedRecipeId , newRating };
+    return { recipeId, newRating };
   }
 
   /** saves a recipeId to recipe_saved table.
@@ -261,21 +265,6 @@ class Recipe {
     await this.updateCount(recipeId, -1);
 
     return removedRecipe;
-  }
-
-  /** Delete given user from database; returns undefined. */
-
-  static async remove(username) {
-    let result = await db.query(
-      `DELETE
-           FROM users
-           WHERE username = $1
-           RETURNING username`,
-      [username],
-    );
-    const user = result.rows[0];
-
-    if (!user) throw new NotFoundError(`No user: ${username}`);
   }
 }
 

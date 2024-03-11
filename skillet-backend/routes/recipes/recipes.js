@@ -3,88 +3,139 @@
 /** Routes for users. */
 
 const jsonschema = require("jsonschema");
+const savedRecipeSchema = require("../../schemas/savedRecipe.json");
+const ratedRecipeSchema = require("../../schemas/rateRecipe.json");
 
 const express = require("express");
 const { ensureCorrectUserOrAdmin, ensureAdmin } = require("../../middleware/auth.js");
 const { BadRequestError } = require("../../expressError.js");
-const User = require("../../models/user/user.js");
-const { createToken } = require("../../helpers/tokens.cjs");
+const Recipe = require("../../models/recipe/recipe.js");
 
 const router = express.Router();
 
-
-/** POST / { user }  => { user, token }
+/** GET gets all saved recipes savedRecipes => { savedRecipes: [recipeId, recipeId, ...] }
  *
- * Adds a new user. This is not the registration endpoint --- instead, this is
- * only for admin users to add new users. The new user being added can be an
- * admin.
+ * @recipeId is an Integer
+ * Returns { savedRecipes: [recipeId, recipeId, ...] }
  *
- * This returns the newly created user and an authentication token for them:
- *  {user: { username, firstName, lastName, email, isAdmin }, token }
- *
- * Authorization required: admin
+ * Authorization required: admin or correct user
  **/
 
-router.post("/", ensureAdmin, async function (req, res, next) {
+router.get("/:username/saved", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
-    const validator = jsonschema.validate(req.body, userNewSchema);
-    if (!validator.valid) {
+    const savedRecipes = await Recipe.getSaved(req.params.username);
+    return res.json({ savedRecipes });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** GET gets all rated recipes ratedRecipes => { ratedRecipes: [recipeId, recipeId, ...] }
+ *
+ * @recipeId is an Integer
+ * Returns { ratedRecipes: [recipeId, recipeId, ...] }
+ *
+ * Authorization required: admin or correct user
+ **/
+
+router.get("/:username/rated", ensureCorrectUserOrAdmin, async function (req, res, next) {
+  try {
+    const ratedRecipes = await Recipe.getRated(req.params.username);
+    return res.json({ ratedRecipes });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** GET gets all saved recipes savedRecipes => { savedRecipes: [recipeId, recipeId, ...] }
+ *
+ * @recipeId is an Integer
+ * Returns { savedRecipes: [recipeId, recipeId, ...] }
+ *
+ * Authorization required: admin or correct user
+ **/
+
+router.post("/stats", async function (req, res, next) {
+  const recipeIds = req.body.recipeIds;
+  try {
+    const recipeStats = await Promise.all(recipeIds.map(async (recipeId) => {
+      return Recipe.getStats(recipeId);
+    }));
+    return res.json(recipeStats);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** POST rates a recipe => { recipeId }
+ *
+ * @recipeId is an Integer
+ * Returns { recipeId: rating }
+ *
+ * Authorization required: admin or correct user
+ **/
+
+router.post("/:username/rate/:recipeId", ensureCorrectUserOrAdmin, async function (req, res, next) {
+  const username = req.params.username;
+  const recipeId = parseInt(req.params.recipeId);
+  const rating = parseInt(req.body.rating);
+
+  try {
+    const validator = jsonschema.validate({ recipeId, rating, username }, ratedRecipeSchema);
+    if (validator.errors.length > 0) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
-
-    const user = await User.register(req.body);
-    const token = createToken(user);
-    return res.status(201).json({ user, token });
+    const ratedRecipe = await Recipe.rate(recipeId, username, rating);
+    return res.status(201).json(ratedRecipe);
   } catch (err) {
     return next(err);
   }
 });
 
-/** GET /[username] => { user }
+/** POST saves a recipe saveRecipe => { recipeId }
  *
- * Returns { username, firstName, lastName, isAdmin, jobs }
- *   where jobs is { id, title, companyHandle, companyName, state }
+ * @recipeId is an Integer
+ * Returns { recipeId }
  *
- * Authorization required: admin or same user-as-:username
+ * Authorization required: admin or correct user
  **/
 
-router.get("/:email", async function (req, res, next) {
-  //want to make this /profile and have email be sent in reqs body
+router.post("/:username/saved/:recipeId", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
-    const user = await User.get(req.params.email);
-    return res.json({ user });
-  } catch (err) {
-    return next(err);
-  }
-});
-
-
-/** PATCH /[username] { user } => { user }
- *
- * Data can include:
- *   { firstName, lastName, password, email }
- *
- * Returns { username, firstName, lastName, email, isAdmin }
- *
- * Authorization required: admin or same-user-as-:username
- **/
-
-router.patch("/:username", ensureCorrectUserOrAdmin, async function (req, res, next) {
-  try {
-    const validator = jsonschema.validate(req.body, userUpdateSchema);
-    if (!validator.valid) {
+    const validator = jsonschema.validate({ recipeId: parseInt(req.params.recipeId), username: req.params.username }, savedRecipeSchema);
+    if (validator.errors.length > 0) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
-
-    const user = await User.update(req.params.username, req.body);
-    return res.json({ user });
+    const savedRecipe = await Recipe.save(req.params.recipeId, req.params.username);
+    return res.status(201).json(savedRecipe);
   } catch (err) {
     return next(err);
   }
 });
 
+/** DELETE removes a saved recipe savedRecipe => { recipeId }
+ *
+ * @recipeId is an Integer
+ * Returns { recipeId }
+ *
+ * Authorization required: admin or correct user
+ **/
+
+router.delete("/:username/saved/:recipeId", ensureCorrectUserOrAdmin, async function (req, res, next) {
+  try {
+    const validator = jsonschema.validate({ recipeId: parseInt(req.params.recipeId), username: req.params.username }, savedRecipeSchema);
+    if (validator.errors.length > 0) {
+      const errs = validator.errors.map(e => e.stack);
+      throw new BadRequestError(errs);
+    }
+    const removedRecipe = await Recipe.removeSaved(req.params.recipeId, req.params.username);
+    return res.status(201).json(removedRecipe);
+  } catch (err) {
+    return next(err);
+  }
+});
 
 /** DELETE /[username]  =>  { deleted: username }
  *

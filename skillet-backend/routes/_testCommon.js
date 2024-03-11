@@ -2,16 +2,17 @@
 
 const db = require("../db.js");
 const User = require("../models/user/user.js");
-const GroceryList = require("../models/groceryList/groceryList.js");
+const Recipe = require("../models/recipe/recipe.js");
 const { createToken } = require("../helpers/tokens.js");
 
 
 async function commonBeforeAll() {
-  // noinspection SqlWithoutWhere
   await db.query("DELETE FROM users");
-  // noinspection SqlWithoutWhere
   await db.query("DELETE FROM grocery_lists")
+  await db.query("DELETE FROM recipe_saved")
+  await db.query("DELETE FROM recipe_stats")
 
+  // create users
   await User.register({
     username: "u1",
     email: "user1@user.com",
@@ -38,6 +39,18 @@ async function commonBeforeAll() {
     lastName: "U3L",
     isAdmin: false,
   });
+
+  //create recipe stats
+  await Recipe.getStats(1);
+  await Recipe.getStats(2);
+
+  // create saved recipes
+  await Recipe.save(1, 'u1');
+  await Recipe.save(2, 'u1');
+
+  // create rated recipes
+  await Recipe.rate(1, 'u1', 4);
+  await Recipe.rate(2, 'u1', 2);
 }
 
 async function commonBeforeEach() {

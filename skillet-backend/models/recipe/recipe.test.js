@@ -51,8 +51,13 @@ describe("getRated", function () {
 
 describe("getStats", function () {
   test("works", async function () {
-    const recipes = await Recipe.getStats("1");
-    expect(recipes).toEqual({ "rating": 4, "recipeId": 1, "saveCount": 5 });
+    const recipeStats = await Recipe.getStats("1");
+    expect(recipeStats).toEqual({ "rating": 4, "recipeId": 1, "saveCount": 5 });
+  });
+
+  test("creates new stats if none found", async function () {
+    const recipeStats = await Recipe.getStats("4");
+    expect(recipeStats).toEqual({ "rating": 0, "recipeId": 4, "saveCount": 0 });
   });
 });
 
@@ -86,8 +91,8 @@ describe("save", function () {
 
 describe("rate", function () {
   test("works", async function () {
-    let ratedRecipe = await Recipe.rate(3, 'u1', 5);
-    expect(ratedRecipe).toEqual({ "newRating": 5, "ratedRecipeId": 3 });
+    let ratedRecipe = await Recipe.rate(2, 'u2', 5);
+    expect(ratedRecipe).toEqual({ "newRating": 4, "ratedRecipeId": 2 });
   });
 
   test("works for exsisting stats but not yet rated by user", async function () {
@@ -126,11 +131,6 @@ describe("updateCount", function () {
     expect(saveCount).toEqual({ "saveCount": 6 });
   });
 
-  test("works with no exsisting stats", async function () {
-    let saveCount = await Recipe.updateCount(50, +1);
-    expect(saveCount).toEqual({ "saveCount": 1 });
-  });
-
   test("works with negative number", async function () {
     let saveCount = await Recipe.updateCount(1, -1);
     expect(saveCount).toEqual({ "saveCount": 4 });
@@ -143,10 +143,5 @@ describe("updateRating", function () {
   test("works with exsisting stats", async function () {
     let rating = await Recipe.updateRating(1, 2);
     expect(rating).toEqual(4);
-  });
-
-  test("works with no exsisting stats", async function () {
-    let rating = await Recipe.updateRating(50, 2);
-    expect(rating).toEqual(2);
   });
 });

@@ -1,0 +1,25 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://www.skillet.com/rateRecipe.schema.json",
+    "type": "object",
+    "properties": {
+        "recipeId": {
+            "type": "integer"
+        },
+        "rating": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5
+        },
+        "username": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "recipeId",
+        "username"
+    ]
+}
