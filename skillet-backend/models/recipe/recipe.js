@@ -79,24 +79,23 @@ class Recipe {
    * if no stats are returned create them
    */
 
-  static async getStats(recipeId) {
+  static async getStats(recipe) {
     const res = await db.query(
-      `SELECT recipe_id AS "recipeId",
-              rating,
+      `SELECT rating,
               save_count AS "saveCount"
       FROM recipe_stats
       WHERE recipe_id = $1`,
-      [recipeId],
+      [recipe.id],
     );
 
     // if no stats are returned create them
     if (res.rows.length === 0) {
-      const newRecipeStats = await this.createStats(recipeId);
+      const newRecipeStats = await this.createStats(recipe.id);
       return newRecipeStats;
     }
 
     const recipeStats = res.rows[0];
-    return recipeStats;
+    return { ...recipe, ...recipeStats };
   }
 
   /** updates the count of a saved recipe 
@@ -199,7 +198,7 @@ class Recipe {
        WHERE recipe_id = $1 AND rated_by = $2`,
       [recipeId, username]
     );
-    
+
     if (checkIfExists.rows.length === 0) {
       await db.query(
         `INSERT INTO recipe_rated_by (recipe_id, rated_by)

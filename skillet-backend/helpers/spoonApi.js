@@ -11,9 +11,10 @@ require("dotenv").config();
 
 class SpoonApi {
 
+    static SKILLET_URL = "http://localhost:3001/recipes";
     static SEARCH_URL = "https://api.spoonacular.com/recipes/complexSearch";
-    static RECIPE_INFO_URL = "https://api.spoonacular.com/recipes"
-    static API_KEY = process.env.SPOON_API_KEY
+    static RECIPE_INFO_URL = "https://api.spoonacular.com/recipes";
+    static API_KEY = process.env.SPOON_API_KEY;
 
     /** makes call to spoon api to get data on multiple recipes
      * 
@@ -41,8 +42,9 @@ class SpoonApi {
                 params: { apiKey: SpoonApi.API_KEY, ...params }
             });
             console.debug("Request URL:", url);
-            const recipeData = await axios.get(url)
-            return recipeData.data.results;
+            const resp = await axios.get(url)
+            const recipeData = await SpoonApi.getRecipeStats(resp.data.results)
+            return recipeData;
         } catch (err) {
             console.error("API Error:", err.response);
             let message = err.response.data.error.message;
@@ -51,15 +53,28 @@ class SpoonApi {
     };
 
     /** builds params for recipe api call */
-    static buildParams({ query, cuisine, diet, number }) {
+    static buildParams({ query, cuisine, diet, type, number }) {
         const params = {};
         if (query) params.query = query;
         if (cuisine) params.cuisine = cuisine;
         if (diet) params.diet = diet;
+        if (type) params.type = type;
         if (number) params.number = number;
 
         return params;
     };
+
+    /** get recipe stats */
+    static async getRecipeStats(recipes) {
+        try {
+            const resp = await axios.post(`${SpoonApi.SKILLET_URL}/stats`, { recipes: recipes });
+            return resp.data;
+        } catch (err) {
+            console.error("API Error:", err.response);
+            let message = err.response.data.error.message;
+            throw Array.isArray(message) ? message : [message];
+        }
+    }
 
     /** makes call to spoon api to get recipe data */
     static async getRecipeInfo(recipeId) {
@@ -71,7 +86,9 @@ class SpoonApi {
             });
             console.debug("Request URL:", url);
             const rawRecipeData = await axios.get(url)
-            return SpoonApi.cleanRecipeInfo(rawRecipeData.data);
+            const cleanedData = await SpoonApi.cleanRecipeInfo(rawRecipeData.data);
+            const finalRecipeData = await SpoonApi.getRecipeStats([cleanedData]);
+            return finalRecipeData;
         } catch (err) {
             console.error("API Error:", err.response);
             let message = err.response.data.error.message;
@@ -97,6 +114,7 @@ class SpoonApi {
         });
 
         const cleanedRecipe = {
+            id: recipeData.id,
             title: recipeData.title,
             sourceName: recipeData.sourceName,
             sourceUrl: recipeData.sourceUrl,

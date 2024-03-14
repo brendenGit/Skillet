@@ -1,17 +1,55 @@
 "use strict";
 
-/** Routes for users. */
+/** Routes for recipes. */
 
 const jsonschema = require("jsonschema");
 const savedRecipeSchema = require("../../schemas/savedRecipe.json");
 const ratedRecipeSchema = require("../../schemas/rateRecipe.json");
 
+const FEATURED_RECIPE_ID = process.env.FEATURED_RECIPE_ID;
+
 const express = require("express");
 const { ensureCorrectUserOrAdmin, ensureAdmin } = require("../../middleware/auth.js");
 const { BadRequestError } = require("../../expressError.js");
 const Recipe = require("../../models/recipe/recipe.js");
+const SpoonApi = require("../../helpers/spoonApi.js");
 
 const router = express.Router();
+
+/** GET gets all saved recipes savedRecipes => { savedRecipes: [recipeId, recipeId, ...] }
+ *
+ * @recipeId is an Integer
+ * Returns { savedRecipes: [recipeId, recipeId, ...] }
+ *
+ * Authorization required: admin or correct user
+ **/
+
+router.get("/", async function (req, res, next) {
+  console.log('inside recipes/ get request')
+  try {
+    const recipes = await SpoonApi.getRecipes({ number: 5, ...req.body });
+    return res.json({ recipes });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** GET gets all saved recipes savedRecipes => { savedRecipes: [recipeId, recipeId, ...] }
+ *
+ * @recipeId is an Integer
+ * Returns { savedRecipes: [recipeId, recipeId, ...] }
+ *
+ * Authorization required: admin or correct user
+ **/
+
+router.get("/featured", async function (req, res, next) {
+  try {
+    const featuredRecipe = await SpoonApi.getRecipeInfo(FEATURED_RECIPE_ID);
+    return res.json({ featuredRecipe });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 /** GET gets all saved recipes savedRecipes => { savedRecipes: [recipeId, recipeId, ...] }
  *
@@ -56,10 +94,10 @@ router.get("/:username/rated", ensureCorrectUserOrAdmin, async function (req, re
  **/
 
 router.post("/stats", async function (req, res, next) {
-  const recipeIds = req.body.recipeIds;
+  const recipes = req.body.recipes;
   try {
-    const recipeStats = await Promise.all(recipeIds.map(async (recipeId) => {
-      return Recipe.getStats(recipeId);
+    const recipeStats = await Promise.all(recipes.map(async (recipe) => {
+      return Recipe.getStats(recipe);
     }));
     return res.json(recipeStats);
   } catch (err) {
