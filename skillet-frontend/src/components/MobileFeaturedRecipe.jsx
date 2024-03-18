@@ -8,7 +8,7 @@ import RatingStars from './RatingStars';
 import Box from '@mui/material/Box';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import { CardActionArea, CardActions, ButtonBase, Button } from '@mui/material';
+import { CardActionArea, ButtonBase } from '@mui/material';
 
 export default function MobileFeaturedRecipe({ recipeData }) {
     function minimizeSummary(str, maxLength) {
@@ -69,14 +69,6 @@ export default function MobileFeaturedRecipe({ recipeData }) {
                     </CardContent>
                 </Card>
             </Box>
-            <Box
-                sx={{
-                    position: 'relative',
-                    width: '100vw',
-                    height: '5px',
-                    backgroundColor: '#ccc'
-                }}
-            />
         </>
     );
 }

@@ -21,7 +21,7 @@ export default function FeaturedRecipe({ recipeData }) {
 
     return (
         <Box sx={{ display: 'flex', marginTop: '3%', flexDirection: 'column', maxWidth: '90%' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: '1%' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Typography
                     variant='h5'
                     sx={{ fontWeight: 'bolder', fontSize: '2rem' }}

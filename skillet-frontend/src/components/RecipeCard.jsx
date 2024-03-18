@@ -6,24 +6,35 @@ import Typography from '@mui/material/Typography';
 import RatingStars from './RatingStars';
 import Box from '@mui/material/Box';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import { CardActionArea, CardActions, ButtonBase, Button } from '@mui/material';
+import Tags from './Tags';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+import { CardActionArea, ButtonBase, } from '@mui/material';
 
-export default function RecipeCard({ recipeData }) {
+export default function RecipeCard({ recipeData, isOnSearchPage }) {
+    const theme = useTheme();
+    const isBiggerThanExtraSmall = useMediaQuery(theme.breakpoints.up('sm'));
+
     return (
-        <Card sx={{ maxWidth: '100%' }} elevation={0}>
+        <Card sx={{ minWidth: '350px', marginRight: isOnSearchPage && !isBiggerThanExtraSmall ? '0' : '2rem' }} elevation={0}>
             <CardActionArea>
                 <CardMedia
                     component="img"
-                    sx={{ width: '100%', height: 'auto', borderRadius: '5%' }}
-                    image={recipeData.imageUrl}
+                    sx={{ width: '100%', height: '177px', objectFit: 'cover', borderRadius: '2%' }}
+                    image={recipeData.image}
                     alt={`Image of ${recipeData.title}`}
                 />
             </CardActionArea>
             <CardContent>
-                <Typography variant="h5" component="div">
+                <Typography variant="h5" component="div" sx={{ fontWeight: 'bold', fontSize: '1.25rem', letterSpacing: '-1px' }}>
                     {recipeData.title}
                 </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: '3%' }}>
+                <Typography variant="body1" sx={{ fontWeight: 'medium', fontSize: '1rem', color: "#555555", display: 'flex', alignItems: 'center' }}>
+                    <AccessTimeIcon sx={{ marginRight: '0.5rem' }} />{`${recipeData.readyInMinutes} minutes | ${recipeData.servings} servings`}
+                </Typography>
+                <Tags recipeData={recipeData} />
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '3%' }}>
                     <RatingStars rating={recipeData.rating} />
                     <Box sx={{ marginLeft: '5%', display: 'flex', flexDirection: 'row' }}>
                         <ButtonBase sx={{ marginTop: '-30%' }}>

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Home from './pages/Home'; 
+import Home from './pages/Home';
+import Search from './pages/Search';
+import Footer from './components/Footer';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -11,8 +13,9 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        {/* Add more routes as needed */}
+        <Route path="/search/:query" element={<Search />} />
       </Routes>
+      <Footer />
     </Router>
   );
 }

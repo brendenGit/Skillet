@@ -1,18 +1,20 @@
-import { ButtonBase, Typography, Box } from '@mui/material';
+import { ButtonBase, Typography, Box, CardActionArea } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { useRef, useState } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import ViewMoreCard from './ViewMoreCard';
 import RecipeCard from './RecipeCard';
 
 
 const ScrollContainer = styled('div')(({ theme }) => ({
     maxWidth: '95vw',
+    display: 'flex',
     overflowX: 'auto',
     marginTop: '3%',
     whiteSpace: 'nowrap',
-    '-webkit-overflow-scrolling': 'touch',
+    WebkitOverflowScrolling: 'touch',
     '& > *': {
         display: 'inline-block',
     },
@@ -39,39 +41,49 @@ const SearchItemContainer = styled('div')(({ theme }) => ({
 }));
 
 
-export default function RecipeRow({ recipes }) {
+export default function RecipeRow(recipeData) {
+    const recipesData = recipeData.recipes;
     const scrollContainerRef = useRef(null);
-    const [showScrollLeft, setShowScrollLeft] = useState(false);
-    const [showScrollRight, setShowScrollReft] = useState(true);
     const theme = useTheme();
     const isBiggerThanExtraSmall = useMediaQuery(theme.breakpoints.up('sm'));
 
-
     const scrollToRight = () => {
         if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollBy({ left: 500, behavior: 'smooth' });
+            const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+            const maxScrollLeft = scrollWidth - clientWidth;
+            if (scrollLeft < maxScrollLeft) {
+                scrollContainerRef.current.scrollBy({ left: 500, behavior: 'smooth' });
+            }
         }
-        setShowScrollReft(false);
-        setShowScrollLeft(true);
     };
 
     const scrollToLeft = () => {
         if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollBy({ left: -500, behavior: 'smooth' });
+            const { scrollLeft } = scrollContainerRef.current;
+            if (scrollLeft > 0) {
+                scrollContainerRef.current.scrollBy({ left: -500, behavior: 'smooth' });
+            }
         }
-        setShowScrollReft(true);
-        setShowScrollLeft(false);
     };
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-            {showScrollLeft && isBiggerThanExtraSmall && <ButtonBase onClick={scrollToLeft}><ArrowCircleLeftIcon sx={{ fontSize: '2rem' }} /></ButtonBase>}
-            <ScrollContainer ref={scrollContainerRef}>
-                {recipes.map(recipe => {
-                    <RecipeCard recipeData={recipe} key={recipe.id} />
-                })}
-            </ScrollContainer>
-            {showScrollRight && isBiggerThanExtraSmall && <ButtonBase onClick={scrollToRight}><ArrowCircleRightIcon sx={{ fontSize: '2rem' }} /></ButtonBase>}
+        <Box sx={{ display: 'flex', marginTop: '3%', flexDirection: 'column', maxWidth: '90%' }}>
+            <Typography
+                variant='h5'
+                sx={{ fontWeight: 'bolder', fontSize: '1.75rem', marginBottom: '0px', padding: '0px' }}
+            >
+                {`${recipesData.type.charAt(0).toUpperCase() + recipesData.type.slice(1)} recipes`}
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'row', marginTop: '0px' }}>
+                {isBiggerThanExtraSmall && <ButtonBase onClick={scrollToLeft}><ArrowCircleLeftIcon sx={{ fontSize: '2rem', marginRight: '20px' }} /></ButtonBase>}
+                <ScrollContainer ref={scrollContainerRef}>
+                    {recipesData.recipes.map(recipe => {
+                        return <RecipeCard recipeData={recipe} key={recipe.id} />
+                    })}
+                    <ViewMoreCard type={recipesData.type} />
+                </ScrollContainer>
+                {isBiggerThanExtraSmall && <ButtonBase onClick={scrollToRight}><ArrowCircleRightIcon sx={{ fontSize: '2rem', marginLeft: '20px' }} /></ButtonBase>}
+            </Box>
         </Box>
     );
 }

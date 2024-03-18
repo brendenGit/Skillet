@@ -46,7 +46,6 @@ export default class SkilletApi {
 
         try {
             const data = await axios({ url, method, params })
-            console.log(data)
             return data;
         } catch (err) {
             console.error("API Error:", err.response);
@@ -61,12 +60,15 @@ export default class SkilletApi {
         return res.data.featuredRecipe[0];
     };
 
-    /** get multiple recipes */
-    async getRecipes(data) {
-        console.log('making GET request to recipes/')
-        console.log(data);
-        let res = await this.request(`recipes/`, data);
-        console.log(res.recipes);
+    /** get random recipes */
+    async getRandom(data) {
+        let res = await this.request(`recipes/random/`, data);
         return res.data;
+    };
+
+    /** get search recipes */
+    async getSearch(data) {
+        let res = await this.request(`recipes/search/`, data);
+        return res.data.recipes;
     };
 };

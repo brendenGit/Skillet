@@ -5,6 +5,7 @@ import FeaturedRecipe from '../components/FeaturedRecipe';
 import MobileFeaturedRecipe from '../components/MobileFeaturedRecipe';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import RecipeRow from '../components/RecipeRow';
+import Seperator from '../components/Seperator';
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
@@ -12,8 +13,10 @@ import { useEffect, useState } from 'react';
 
 export default function Home() {
     const mealTypes = ['main course', 'side dish', 'dessert', 'appetizer', 'salad', 'bread', 'breakfast', 'soup', 'beverage', 'fingerfood', 'snack', 'drink']
-    const cuisineTypes = ['African', 'Asian', 'American', 'British', 'Cajun', 'Caribbean', 'Chinese', 'Eastern European', 'European', 'French', 'German', 'Greek', 'Indian',
-        'Irish', 'Italian', 'Japanese', 'Jewish', 'Korean', 'Latin American', 'Mediterranean', 'Mexican', 'Middle Eastern', 'Nordic', 'Southern', 'Spanish', 'Thai']
+    const cuisineTypes = ['asian', 'american', 'british', 'cajun', 'chinese', 'eastern european', 'european', 'french', 'german', 'greek', 
+                          'indian', 'irish', 'italian', 'japanese','korean', 'latin american', 'mediterranean', 'mexican', 'middle eastern', 
+                          'southern', 'spanish', 'thai']
+    const dietsTypes = ['gluten free', 'ketogenic', 'vegetarian', 'lacto vegetarian', 'ovo vegetarian', 'vegan', 'pescetarian'];
 
     const [homeData, setHomeData] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
@@ -34,11 +37,25 @@ export default function Home() {
             try {
                 const homeDataObj = {};
                 const skilletApi = new SkilletApi();
+                const randMealtype = getRandomItem(mealTypes);
+                const randCuisineType = getRandomItem(cuisineTypes);
+                const randDietType = getRandomItem(dietsTypes);
+
+                //get featured data
                 homeDataObj.featuredRecipe = await skilletApi.getFeatured();
-                const randMealType1 = getRandomItem(mealTypes);
-                const randMealType2 = getRandomItem(mealTypes);
-                homeDataObj.randMealtype1 = await skilletApi.getRecipes({ type: randMealType1 })
-                console.log(homeDataObj.randMealtype1);
+
+                //get random meal type recipes
+                const randMealTypeRecipes = await skilletApi.getRandom({ type: randMealtype })
+                homeDataObj.randMealtype = { type: randMealtype, recipes: randMealTypeRecipes.recipes }
+
+                //get random cuisine type recipes
+                const randCuisineTypeRecipes = await skilletApi.getRandom({ type: randCuisineType })
+                homeDataObj.randCuisineType = { type: randCuisineType, recipes: randCuisineTypeRecipes.recipes }
+
+                //get random diet type recipes
+                const randDietTypeRecipes = await skilletApi.getRandom({ type: randDietType })
+                homeDataObj.randDietType = { type: randDietType, recipes: randDietTypeRecipes.recipes }
+
                 setHomeData(homeDataObj);
                 setIsLoading(false)
             } catch (error) {
@@ -50,7 +67,7 @@ export default function Home() {
     }, []);
 
     return (
-        <Box id="test" sx={{
+        <Box sx={{
             display: 'flex',
             flexDirection: 'column',
             margin: '0 auto',
@@ -64,8 +81,14 @@ export default function Home() {
                 <>
                     <BubbleSection />
                     {!isBiggerThanExtraSmall && <MobileFeaturedRecipe recipeData={homeData.featuredRecipe} />}
+                    {!isBiggerThanExtraSmall && <Seperator />}
                     {isBiggerThanExtraSmall && <FeaturedRecipe recipeData={homeData.featuredRecipe} />}
-                    <RecipeRow />
+                    <RecipeRow recipes={homeData.randMealtype} />
+                    {!isBiggerThanExtraSmall && <Seperator />}
+                    <RecipeRow recipes={homeData.randCuisineType} />
+                    {!isBiggerThanExtraSmall && <Seperator />}
+                    <RecipeRow recipes={homeData.randDietType} />
+                    {!isBiggerThanExtraSmall && <Seperator />}
                 </>
             )}
         </Box>

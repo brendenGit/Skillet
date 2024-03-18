@@ -11,7 +11,7 @@ const ScrollContainer = styled('div')(({ theme }) => ({
     overflowX: 'auto',
     marginTop: '3%',
     whiteSpace: 'nowrap',
-    '-webkit-overflow-scrolling': 'touch',
+    WebkitOverflowScrolling: 'touch',
     '& > *': {
         display: 'inline-block',
     },
@@ -33,7 +33,7 @@ const SearchItemContainer = styled('div')(({ theme }) => ({
     justifyContent: 'center',
     marginRight: '30px',
     [theme.breakpoints.up('sm')]: {
-        marginRight: '40px',
+        marginRight: '30px',
     }
 }));
 
