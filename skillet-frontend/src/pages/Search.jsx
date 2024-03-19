@@ -1,10 +1,8 @@
 import * as React from 'react';
 import SkilletApi from '../utils/SkilletApi.cjs';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import BubbleSection from '../components/BubbleSection';
 import RecipeCard from '../components/RecipeCard';
 import { Box, Button, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -15,7 +13,7 @@ export default function Search() {
     const [viewingRecipes, setViewingRecipes] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [buttonDisable, setButtonDisable] = useState(false);
-    
+
 
     useEffect(() => {
         setIsLoading(true)
@@ -36,7 +34,7 @@ export default function Search() {
             }
         }
         fetchHomeData();
-    }, []);
+    }, [query]);
 
     const loadMore = () => {
         setViewingRecipes([...viewingRecipes, ...searchData.slice(9)]);

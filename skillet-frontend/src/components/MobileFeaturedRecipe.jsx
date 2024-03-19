@@ -22,8 +22,8 @@ export default function MobileFeaturedRecipe({ recipeData }) {
             <Box sx={{ display: 'flex', marginTop: '6%', flexDirection: 'column', maxWidth: '90%', position: 'relative' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: '3%' }}>
                     <Typography
-                        variant='h5'
-                        sx={{ fontWeight: 'bolder', fontSize: '1.45rem' }}
+                        variant='h3'
+                        sx={{ fontWeight: 'bolder', fontSize: '1.6rem' }}
                     >
                         Featured Recipe
                     </Typography>

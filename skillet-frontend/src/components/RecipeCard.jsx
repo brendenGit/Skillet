@@ -9,19 +9,30 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import Tags from './Tags';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import { CardActionArea, ButtonBase, } from '@mui/material';
 
 export default function RecipeCard({ recipeData, isOnSearchPage }) {
+    const navigateTo = useNavigate();
     const theme = useTheme();
     const isBiggerThanExtraSmall = useMediaQuery(theme.breakpoints.up('sm'));
 
+    function goToRecipe() {
+        navigateTo(`/recipes/${recipeData.title}`, { state: { recipeData } });
+    }
+
     return (
-        <Card sx={{ minWidth: '350px', marginRight: isOnSearchPage && !isBiggerThanExtraSmall ? '0' : '2rem' }} elevation={0}>
-            <CardActionArea>
+        <Card sx={{ minWidth: '350px', maxWidth: '350px', marginRight: isOnSearchPage && !isBiggerThanExtraSmall ? '0' : '2rem' }} elevation={0}>
+            <CardActionArea onClick={goToRecipe}>
                 <CardMedia
                     component="img"
-                    sx={{ width: '100%', height: '177px', objectFit: 'cover', borderRadius: '2%' }}
+                    sx={{
+                        maxWidth: '100%',
+                        maxHeight: '200px',
+                        objectFit: 'cover',
+                        borderRadius: '2%'
+                    }}
                     image={recipeData.image}
                     alt={`Image of ${recipeData.title}`}
                 />

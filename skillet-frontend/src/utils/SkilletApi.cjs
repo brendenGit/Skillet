@@ -40,7 +40,6 @@ export default class SkilletApi {
     //requests that do not require auth, these will only ever be get requests
     async request(endpoint, data = {}, method = "get") {
         console.debug("API Call:", endpoint, method);
-
         const url = `${BASE_URL}/${endpoint}`;
         const params = data;
 
@@ -58,6 +57,12 @@ export default class SkilletApi {
     async getFeatured() {
         let res = await this.request(`recipes/featured`);
         return res.data.featuredRecipe[0];
+    };
+
+    async getRecipe(recipeId) {
+        console.log('making call to get recipe')
+        let res = await this.request(`recipes/${recipeId}/info`);
+        return res.data.recipe[0];
     };
 
     /** get random recipes */

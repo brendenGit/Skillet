@@ -29,18 +29,6 @@ const ScrollContainer = styled('div')(({ theme }) => ({
     }
 }));
 
-const SearchItemContainer = styled('div')(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: '30px',
-    [theme.breakpoints.up('sm')]: {
-        marginRight: '40px',
-    }
-}));
-
-
 export default function RecipeRow(recipeData) {
     const recipesData = recipeData.recipes;
     const scrollContainerRef = useRef(null);
@@ -70,7 +58,7 @@ export default function RecipeRow(recipeData) {
         <Box sx={{ display: 'flex', marginTop: '3%', flexDirection: 'column', maxWidth: '90%' }}>
             <Typography
                 variant='h5'
-                sx={{ fontWeight: 'bolder', fontSize: '1.75rem', marginBottom: '0px', padding: '0px' }}
+                sx={{ fontWeight: 'bolder', fontSize: { xs: '1.66rem', sm: '1.75rem' }, marginBottom: '0px', padding: '0px' }}
             >
                 {`${recipesData.type.charAt(0).toUpperCase() + recipesData.type.slice(1)} recipes`}
             </Typography>

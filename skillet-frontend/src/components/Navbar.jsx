@@ -10,6 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import { useNavigate } from 'react-router-dom';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -44,6 +45,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function Navbar() {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const isMenuOpen = Boolean(anchorEl);
+
+    const navigateTo = useNavigate();
 
     const handleProfileMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -80,10 +83,11 @@ export default function Navbar() {
             <Toolbar sx={{ display: 'flex', justifyContent: { xs: 'space-between', sm: 'center' } }}>
                 <Typography
                     variant="h4"
+                    component="a"
                     noWrap
-                    component="div"
+                    href='/'
                     fontWeight="bolder"
-                    sx={{ color: '#ff4242', letterSpacing: '-2.5px' }}
+                    sx={{ color: '#ff4242', letterSpacing: '-2.5px', textDecoration: 'none' }}
                 >
                     Skillet
                 </Typography>
@@ -94,6 +98,11 @@ export default function Navbar() {
                     <StyledInputBase
                         placeholder="Search…"
                         inputProps={{ 'aria-label': 'search' }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                navigateTo(`/search/${e.target.value}`);
+                            }
+                        }}
                     />
                 </Search>
                 <Box>

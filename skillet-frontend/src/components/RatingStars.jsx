@@ -19,7 +19,6 @@ export default function RatingStars({ rating }) {
                     {rating}
                 </Typography>
             </Box>
-
         </Box >
     );
 }

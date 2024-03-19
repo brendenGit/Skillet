@@ -24,10 +24,9 @@ const router = express.Router();
  * Authorization required: admin or correct user
  **/
 
-router.get("/", async function (req, res, next) {
-  console.log('inside recipes/ get request')
+router.get("/random", async function (req, res, next) {
   try {
-    const recipes = await SpoonApi.getRecipes({ number: 5, ...req.body });
+    const recipes = await SpoonApi.getRandomRecipes({ number: 5, ...req.query });
     return res.json({ recipes });
   } catch (err) {
     return next(err);
@@ -39,13 +38,47 @@ router.get("/", async function (req, res, next) {
  * @recipeId is an Integer
  * Returns { savedRecipes: [recipeId, recipeId, ...] }
  *
- * Authorization required: admin or correct user
+ **/
+
+router.get("/search", async function (req, res, next) {
+  try {
+    const recipes = await SpoonApi.getRecipes({ number: 18, ...req.query });
+    return res.json({ recipes });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** GET gets data for featured recipe
+ *
+ * @recipeId is an Integer
+ * Returns { savedRecipes: [recipeId, recipeId, ...] }
+ *
  **/
 
 router.get("/featured", async function (req, res, next) {
   try {
     const featuredRecipe = await SpoonApi.getRecipeInfo(FEATURED_RECIPE_ID);
     return res.json({ featuredRecipe });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+
+/** GET gets a specific recipes data from the Spoonacular API
+ *
+ * @recipeId is an Integer
+ * Returns { savedRecipes: [recipeId, recipeId, ...] }
+ *
+ **/
+
+router.get("/:recipeId/info", async function (req, res, next) {
+  console.log('inside get recipe route')
+  try {
+    const recipeId = req.params.recipeId;
+    const recipe = await SpoonApi.getRecipeInfo(recipeId);
+    return res.json({ recipe });
   } catch (err) {
     return next(err);
   }

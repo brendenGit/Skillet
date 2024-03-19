@@ -91,7 +91,7 @@ class Recipe {
     // if no stats are returned create them
     if (res.rows.length === 0) {
       const newRecipeStats = await this.createStats(recipe.id);
-      return newRecipeStats;
+      return { ...recipe, ...newRecipeStats };
     }
 
     const recipeStats = res.rows[0];

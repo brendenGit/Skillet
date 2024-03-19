@@ -67,10 +67,10 @@ export default function BubbleSection() {
     };
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', maxWidth: '1280px' }}>
             {showScrollLeft && isBiggerThanExtraSmall && <ButtonBase onClick={scrollToLeft}><ArrowCircleLeftIcon sx={{ fontSize: '2rem' }} /></ButtonBase>}
             <ScrollContainer ref={scrollContainerRef}>
-                <ButtonBase>
+                <ButtonBase href="/search/desserts">
                     <SearchItemContainer>
                         <ItemImg src="/icons8-cherry-cheesecake-100.png" alt="icons 8 pcherry-cheesecake-100" />
                         <Typography
@@ -81,7 +81,7 @@ export default function BubbleSection() {
                         </Typography>
                     </SearchItemContainer>
                 </ButtonBase>
-                <ButtonBase>
+                <ButtonBase href="/search/burger">
                     <SearchItemContainer>
                         <ItemImg src="/icons8-hamburger-100.png" alt="icons 8 hamburger-100" />
                         <Typography
@@ -92,7 +92,7 @@ export default function BubbleSection() {
                         </Typography>
                     </SearchItemContainer>
                 </ButtonBase>
-                <ButtonBase>
+                <ButtonBase href="/search/vegetarian">
                     <SearchItemContainer>
                         <ItemImg src="/icons8-natural-food-100.png" alt="icons 8 natrual-food-100" />
                         <Typography
@@ -103,7 +103,7 @@ export default function BubbleSection() {
                         </Typography>
                     </SearchItemContainer>
                 </ButtonBase>
-                <ButtonBase>
+                <ButtonBase href="/search/pizza">
                     <SearchItemContainer>
                         <ItemImg src="/icons8-pizza-100.png" alt="icons 8 piza-100" />
                         <Typography
@@ -114,7 +114,7 @@ export default function BubbleSection() {
                         </Typography>
                     </SearchItemContainer>
                 </ButtonBase>
-                <ButtonBase>
+                <ButtonBase href="/search/asian">
                     <SearchItemContainer>
                         <ItemImg src="/icons8-rice-bowl-100.png" alt="icons 8 rice-bowl-100" />
                         <Typography
@@ -125,18 +125,18 @@ export default function BubbleSection() {
                         </Typography>
                     </SearchItemContainer>
                 </ButtonBase>
-                <ButtonBase>
+                <ButtonBase href="/search/chicken">
                     <SearchItemContainer>
-                        <ItemImg src="/icons8-sandwich-100.png" alt="icons 8 sandwhich-100" />
+                        <ItemImg src="/icons8-fried-chicken-100.png" alt="icons 8 fried-chicken-100" />
                         <Typography
                             variant="p"
                             sx={{ fontSize: ".85rem", fontWeight: "bold" }}
                         >
-                            Sandwhiches
+                            Chicken
                         </Typography>
                     </SearchItemContainer>
                 </ButtonBase>
-                <ButtonBase>
+                <ButtonBase href="/search/steak">
                     <SearchItemContainer>
                         <ItemImg src="/icons8-steak-100.png" alt="icons 8 steak-100" />
                         <Typography
@@ -147,7 +147,7 @@ export default function BubbleSection() {
                         </Typography>
                     </SearchItemContainer>
                 </ButtonBase>
-                <ButtonBase>
+                <ButtonBase href="/search/breakfast">
                     <SearchItemContainer>
                         <ItemImg src="/icons8-sunny-side-up-eggs-100.png" alt="icons 8 sunny-side-up-eggs-100" />
                         <Typography
@@ -158,7 +158,7 @@ export default function BubbleSection() {
                         </Typography>
                     </SearchItemContainer>
                 </ButtonBase>
-                <ButtonBase>
+                <ButtonBase href="/search/japanese">
                     <SearchItemContainer>
                         <ItemImg src="/icons8-sushi-100.png" alt="icons 8 sushi-100" />
                         <Typography
@@ -169,7 +169,7 @@ export default function BubbleSection() {
                         </Typography>
                     </SearchItemContainer>
                 </ButtonBase>
-                <ButtonBase>
+                <ButtonBase href="/search/mexican">
                     <SearchItemContainer>
                         <ItemImg src="/icons8-taco-100.png" alt="icons 8 taco-100" />
                         <Typography
@@ -177,6 +177,61 @@ export default function BubbleSection() {
                             sx={{ fontSize: ".85rem", fontWeight: "bold" }}
                         >
                             Mexican
+                        </Typography>
+                    </SearchItemContainer>
+                </ButtonBase>
+                <ButtonBase href="/search/lamb">
+                    <SearchItemContainer>
+                        <ItemImg src="/icons8-rack-of-lamb-100.png" alt="icons 8 rack-of-lamb-100" />
+                        <Typography
+                            variant="p"
+                            sx={{ fontSize: ".85rem", fontWeight: "bold" }}
+                        >
+                            Lamb
+                        </Typography>
+                    </SearchItemContainer>
+                </ButtonBase>
+                <ButtonBase href="/search/cake">
+                    <SearchItemContainer>
+                        <ItemImg src="/icons8-birthday-cake-100.png" alt="icons 8 birthday-cake-100" />
+                        <Typography
+                            variant="p"
+                            sx={{ fontSize: ".85rem", fontWeight: "bold" }}
+                        >
+                            Cake
+                        </Typography>
+                    </SearchItemContainer>
+                </ButtonBase>
+                <ButtonBase href="/search/burrito">
+                    <SearchItemContainer>
+                        <ItemImg src="/icons8-burrito-100.png" alt="icons 8 burrito-100" />
+                        <Typography
+                            variant="p"
+                            sx={{ fontSize: ".85rem", fontWeight: "bold" }}
+                        >
+                            Burritos
+                        </Typography>
+                    </SearchItemContainer>
+                </ButtonBase>
+                <ButtonBase href="/search/chinese">
+                    <SearchItemContainer>
+                        <ItemImg src="/icons8-chinese-noodle-100.png" alt="icons 8 chinese-noodle-100" />
+                        <Typography
+                            variant="p"
+                            sx={{ fontSize: ".85rem", fontWeight: "bold" }}
+                        >
+                            Chinese
+                        </Typography>
+                    </SearchItemContainer>
+                </ButtonBase>
+                <ButtonBase href="/search/bread">
+                    <SearchItemContainer>
+                        <ItemImg src="/icons8-bread-100.png" alt="icons 8 bread-100" />
+                        <Typography
+                            variant="p"
+                            sx={{ fontSize: ".85rem", fontWeight: "bold" }}
+                        >
+                            Bread
                         </Typography>
                     </SearchItemContainer>
                 </ButtonBase>
