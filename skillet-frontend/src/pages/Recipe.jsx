@@ -13,6 +13,9 @@ import SkilletApi from '../utils/SkilletApi.cjs';
 import IngredientList from '../components/IngredientList';
 import PreperationList from '../components/PreperationList';
 import Rate from '../components/Rate';
+import LoadingModal from '../components/LoadingModal';
+import SaveRecipeBtn from '../components/SaveRecipeBtn';
+import { useSelector } from 'react-redux';
 
 
 export default function Recipe() {
@@ -20,9 +23,12 @@ export default function Recipe() {
     const [isLoading, setIsLoading] = useState(true);
     const [recipeData, setRecipeData] = useState(null);
     const [summary, setSummary] = useState(null);
+    const user = useSelector((state) => state.user);
+
 
     useEffect(() => {
         const fetchRecipeData = async () => {
+            console.log(location.state.recipeData.id)
             try {
                 const skilletApi = new SkilletApi();
                 const recipe = await skilletApi.getRecipe(location.state.recipeData.id);
@@ -44,10 +50,11 @@ export default function Recipe() {
             margin: '0 auto',
             alignItems: 'center',
             justifyContent: 'center',
-            maxWidth: { xs: '85vw', sm: "1280px" }
+            maxWidth: { xs: '85vw', sm: "1280px" },
+            marginBottom: 10
         }}>
             {isLoading ? (
-                <p>Loading...</p>
+                <LoadingModal />
             ) : (
                 <>
                     {console.log(recipeData)}
@@ -100,8 +107,7 @@ export default function Recipe() {
                                         </Typography>
                                         <Rate />
                                     </Box>
-                                    <Button variant="contained" sx={{ maxWidth: '10rem', marginTop: 3 }}><BookmarkBorderIcon />Save</Button>
-
+                                    <SaveRecipeBtn saved={false} saveCount={recipeData.saveCount} isRecipe={true} />
                                 </Box>
                             </Grid>
                             <Grid item xs={0} sm={1} />

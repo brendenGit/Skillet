@@ -5,15 +5,18 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import RatingStars from './RatingStars';
 import Box from '@mui/material/Box';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import Tags from './Tags';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import SaveRecipeBtn from './SaveRecipeBtn';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import { CardActionArea, ButtonBase, } from '@mui/material';
+import { useState } from 'react';
 
 export default function RecipeCard({ recipeData, isOnSearchPage }) {
+    const [saveCount, setSaveCount] = useState(null)
+    const [saved, setSaved] = useState(null)
     const navigateTo = useNavigate();
     const theme = useTheme();
     const isBiggerThanExtraSmall = useMediaQuery(theme.breakpoints.up('sm'));
@@ -48,12 +51,7 @@ export default function RecipeCard({ recipeData, isOnSearchPage }) {
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '3%' }}>
                     <RatingStars rating={recipeData.rating} />
                     <Box sx={{ marginLeft: '5%', display: 'flex', flexDirection: 'row' }}>
-                        <ButtonBase sx={{ marginTop: '-30%' }}>
-                            <BookmarkBorderIcon />
-                            <Typography variant='h7'>
-                                {recipeData.saveCount}
-                            </Typography>
-                        </ButtonBase>
+                        <SaveRecipeBtn saved={false} saveCount={recipeData.saveCount} />
                     </Box>
                 </Box>
             </CardContent>

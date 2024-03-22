@@ -9,8 +9,16 @@ import Box from '@mui/material/Box';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import { CardActionArea, ButtonBase } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function MobileFeaturedRecipe({ recipeData }) {
+    const navigateTo = useNavigate();
+
+    function goToRecipe() {
+        navigateTo(`/recipes/${recipeData.title}`, { state: { recipeData } });
+    }
+
     function minimizeSummary(str, maxLength) {
         return str.slice(0, maxLength);
     }
@@ -28,7 +36,7 @@ export default function MobileFeaturedRecipe({ recipeData }) {
                         Featured Recipe
                     </Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                        <ButtonBase sx={{ borderRadius: '5px' }}>
+                        <ButtonBase sx={{ borderRadius: '5px' }} onClick={goToRecipe}>
                             <Typography
                                 variant='p'
                                 sx={{ marginRight: '5px' }}
@@ -40,7 +48,7 @@ export default function MobileFeaturedRecipe({ recipeData }) {
                     </Box>
                 </Box>
                 <Card sx={{ maxWidth: '100%' }} elevation={0}>
-                    <CardActionArea>
+                    <CardActionArea onClick={goToRecipe}>
                         <CardMedia
                             component="img"
                             sx={{ width: '100%', height: 'auto', borderRadius: '5%' }}

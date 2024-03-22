@@ -47,6 +47,7 @@ router.post("/token", async function (req, res, next) {
 
 router.post("/register", async function (req, res, next) {
   try {
+    console.log(req.body)
     const validator = jsonschema.validate(req.body, userRegisterSchema);
     if (!validator.valid) {
       const errs = validator.errors.map(e => e.stack);
@@ -55,7 +56,7 @@ router.post("/register", async function (req, res, next) {
 
     const user = await User.register({ ...req.body, isAdmin: false });
     const token = createToken(user);
-    return res.status(201).json({ token, user });
+    return res.status(201).json({ token, ...user });
   } catch (err) {
     return next(err);
   }

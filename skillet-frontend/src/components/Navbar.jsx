@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -10,7 +9,13 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import { useNavigate } from 'react-router-dom';
+import LoginModal from './LoginModal';
+import SignUpModal from './SignUpModal';
+import { updateUserOnLogin } from '../features/user/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -42,11 +47,27 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function Navbar() {
+const pages = {
+    noUser: [
+        { key: 'loginModal', component: <LoginModal /> },
+        { key: 'signUpModal', component: <SignUpModal /> }
+    ],
+    loggedIn: [
+        { key: 'savedRecipes', label: 'Saved Recipes', path: '/saved-recipes' },
+        { key: 'groceryLists', label: 'Grocery Lists', path: '/grocery-lists' },
+        { key: 'account', label: 'Account', path: '/account' }
+    ]
+};
+
+export default function Navbar({ user }) {
+    const navigateTo = useNavigate();
+    console.log(user)
+    useEffect(() => {
+        console.log('user logged in');
+    }, [user]);
+
     const [anchorEl, setAnchorEl] = React.useState(null);
     const isMenuOpen = Boolean(anchorEl);
-
-    const navigateTo = useNavigate();
 
     const handleProfileMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -56,6 +77,7 @@ export default function Navbar() {
         setAnchorEl(null);
     };
 
+    let renderPages = user.username ? pages.loggedIn : pages.noUser;
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
         <Menu
@@ -73,8 +95,11 @@ export default function Navbar() {
             open={isMenuOpen}
             onClose={handleMenuClose}
         >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            {renderPages.map((item) => (
+                <MenuItem key={item.key} onClick={handleMenuClose}>
+                    {item.component || <Link to={item.path}>{item.label}</Link>}
+                </MenuItem>
+            ))}
         </Menu>
     );
 
@@ -87,7 +112,7 @@ export default function Navbar() {
                     noWrap
                     href='/'
                     fontWeight="bolder"
-                    sx={{ color: '#ff4242', letterSpacing: '-2.5px', textDecoration: 'none' }}
+                    sx={{ color: '#ff4242', letterSpacing: '-2px', textDecoration: 'none' }}
                 >
                     Skillet
                 </Typography>

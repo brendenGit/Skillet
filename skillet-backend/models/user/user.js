@@ -57,7 +57,7 @@ class User {
             last_name,
             is_admin)
            VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING id, username, first_name AS "firstName", is_admin AS "isAdmin"`,
+           RETURNING id, username, is_admin AS "isAdmin"`,
       [
         username,
         email,
@@ -67,10 +67,8 @@ class User {
         isAdmin
       ],
     );
-
-    const user = result.rows[0];
-
-    return user;
+    
+    return result.rows[0];
   }
 
 

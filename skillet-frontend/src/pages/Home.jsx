@@ -9,6 +9,7 @@ import Seperator from '../components/Seperator';
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
+import LoadingModal from '../components/LoadingModal';
 
 
 export default function Home() {
@@ -76,7 +77,7 @@ export default function Home() {
             maxWidth: '1280px'
         }}>
             {isLoading ? (
-                <p>Loading...</p>
+                <LoadingModal />
             ) : (
                 <>
                     <BubbleSection />

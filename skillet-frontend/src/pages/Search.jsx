@@ -2,6 +2,7 @@ import * as React from 'react';
 import SkilletApi from '../utils/SkilletApi.cjs';
 import BubbleSection from '../components/BubbleSection';
 import RecipeCard from '../components/RecipeCard';
+import LoadingModal from '../components/LoadingModal';
 import { Box, Button, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -25,8 +26,9 @@ export default function Search() {
 
                 //get search data
                 const data = await skilletApi.getSearch({ query: query })
-                setSearchData(data);
-                setViewingRecipes(data.slice(0, 9))
+                const recipes = data.recipes;
+                setSearchData(recipes);
+                setViewingRecipes(recipes.slice(0, 9))
                 setIsLoading(false)
             } catch (error) {
                 setIsLoading(false)
@@ -48,9 +50,10 @@ export default function Search() {
             margin: '0 auto',
             alignItems: 'center',
             justifyContent: 'center',
+            marginBottom: 10
         }}>
             {isLoading ? (
-                <p>Loading...</p>
+                <LoadingModal />
             ) : (
                 <>
                     <BubbleSection />

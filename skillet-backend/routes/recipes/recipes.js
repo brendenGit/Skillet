@@ -58,6 +58,7 @@ router.get("/search", async function (req, res, next) {
 
 router.get("/featured", async function (req, res, next) {
   try {
+    console.log('inside featured')
     const featuredRecipe = await SpoonApi.getRecipeInfo(FEATURED_RECIPE_ID);
     return res.json({ featuredRecipe });
   } catch (err) {

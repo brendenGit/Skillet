@@ -7,11 +7,17 @@ import Typography from '@mui/material/Typography';
 import parse from 'html-react-parser';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import RatingStars from './RatingStars';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import SaveRecipeBtn from './SaveRecipeBtn';
+import { useNavigate } from 'react-router-dom';
 import { ButtonBase, CardActionArea } from '@mui/material';
 
 
 export default function FeaturedRecipe({ recipeData }) {
+    const navigateTo = useNavigate();
+
+    function goToRecipe() {
+        navigateTo(`/recipes/${recipeData.title}`, { state: { recipeData } });
+    }
 
     function minimizeSummary(str, maxLength) {
         return str.slice(0, maxLength);
@@ -24,14 +30,14 @@ export default function FeaturedRecipe({ recipeData }) {
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Typography
                     variant='h5'
-                    sx={{ fontWeight: 'bolder', fontSize: '2rem' }}
+                    sx={{ fontWeight: 'bolder', fontSize: '2rem', marginBottom: 1 }}
                 >
                     Featured Recipe
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                    <ButtonBase sx={{ borderRadius: '5px' }}>
+                    <ButtonBase sx={{ borderRadius: '5px' }} onClick={goToRecipe}>
                         <Typography
-                            sx={{ marginRight: '5px' }}
+                            sx={{ marginRight: '5px', fontWeight: 'bold' }}
                         >
                             Go to Recipe
                         </Typography>
@@ -40,7 +46,7 @@ export default function FeaturedRecipe({ recipeData }) {
                 </Box>
             </Box>
             <Card elevation={0} sx={{ display: 'flex' }}>
-                <CardActionArea>
+                <CardActionArea onClick={goToRecipe}>
                     <CardMedia
                         component="img"
                         sx={{ width: '500px', height: 'auto', borderRadius: '5%' }}
@@ -56,21 +62,15 @@ export default function FeaturedRecipe({ recipeData }) {
                         <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: '3%' }}>
                             <RatingStars rating={recipeData.rating} />
                             <Box sx={{ marginLeft: '5%', display: 'flex', flexDirection: 'row' }}>
-                                <ButtonBase sx={{ marginTop: '-30%'}}>
-                                    <BookmarkBorderIcon />
-                                    <Typography variant='h7'>
-                                        {recipeData.saveCount}
-                                    </Typography>
-                                </ButtonBase>
+                                <SaveRecipeBtn saved={false} saveCount={recipeData.saveCount} />
                             </Box>
-
                         </Box>
                         <Typography variant="p" color="text.secondary" component="div" sx={{ lineHeight: '1.33' }}>
                             {reducedRecipeSummary}{'...'}
                         </Typography>
                     </CardContent>
                 </Box>
-            </Card>
+            </Card >
         </Box >
     );
 }

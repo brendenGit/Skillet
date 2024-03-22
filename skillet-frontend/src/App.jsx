@@ -3,21 +3,20 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Search from './pages/Search';
-import Footer from './components/Footer';
 import Recipe from './pages/Recipe';
+import { useDispatch, useSelector } from 'react-redux';
 
 function App() {
-  const [count, setCount] = useState(0);
+  const user = useSelector((state) => state.user);
 
   return (
     <Router>
-      <Navbar />
+      <Navbar user={user} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/search/:query" element={<Search />} />
         <Route path="/recipes/:recipeTitle" element={<Recipe />} />
       </Routes>
-      <Footer />
     </Router>
   );
 }

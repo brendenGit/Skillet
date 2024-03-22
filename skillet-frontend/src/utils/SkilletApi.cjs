@@ -16,64 +16,95 @@ export default class SkilletApi {
         this.token = token || "";
     }
 
-    //requests that require auth
-    async authedRequest(endpoint, data = {}, method = "get") {
+    async request(endpoint, data = {}, method = "get") {
         console.debug("API Call:", endpoint, data, method);
 
-        //there are multiple ways to pass an authorization token, this is how you pass it in the header.
-        //this has been provided to show you another way to pass the token. you are only expected to read this code for this project.
         const url = `${BASE_URL}/${endpoint}`;
         const headers = { Authorization: `Bearer ${this.token}` };
-        const params = (method === "get")
-            ? data
-            : {};
+
+        const config = {
+            url,
+            method,
+            headers,
+            ...(method === 'get' ? { params: data } : { data })
+        };
 
         try {
-            return (await axios({ url, method, data, params, headers })).data;
+            const res = await axios(config);
+            return res.data;
         } catch (err) {
             console.error("API Error:", err.response);
-            let message = err.response.data.error.message;
-            throw Array.isArray(message) ? message : [message];
-        };
-    };
+            let message = err.response?.data?.error?.message || "An unknown error occurred";
+            throw new Error(message);
+        }
+    }
 
-    //requests that do not require auth, these will only ever be get requests
-    async request(endpoint, data = {}, method = "get") {
-        console.debug("API Call:", endpoint, method);
-        const url = `${BASE_URL}/${endpoint}`;
-        const params = data;
 
-        try {
-            const data = await axios({ url, method, params })
-            return data;
-        } catch (err) {
-            console.error("API Error:", err.response);
-            let message = err.response.data.error.message;
-            throw Array.isArray(message) ? message : [message];
-        };
-    };
 
+    /** Recipes */
     /** get featured recipe */
     async getFeatured() {
-        let res = await this.request(`recipes/featured`);
-        return res.data.featuredRecipe[0];
+        let featuredRecipe = await this.request(`recipes/featured`);
+        return featuredRecipe.featuredRecipe[0];
     };
 
     async getRecipe(recipeId) {
-        console.log('making call to get recipe')
-        let res = await this.request(`recipes/${recipeId}/info`);
-        return res.data.recipe[0];
+        let recipe = await this.request(`recipes/${recipeId}/info`);
+        return recipe.recipe[0];
     };
 
     /** get random recipes */
     async getRandom(data) {
-        let res = await this.request(`recipes/random/`, data);
-        return res.data;
+        let randomRecipes = await this.request(`recipes/random/`, data);
+        return randomRecipes;
     };
 
     /** get search recipes */
     async getSearch(data) {
-        let res = await this.request(`recipes/search/`, data);
-        return res.data.recipes;
+        let searchRecipes = await this.request(`recipes/search/`, data);
+        return searchRecipes;
+    };
+
+
+    /** Users */
+    /** attempt login */
+    async login(data) {
+        const { username, password } = data;
+        try {
+            let tokenRes = await this.request(`auth/token`, { username, password }, 'post');
+            this.token = tokenRes.token;
+            let userRes = await this.request(`users/${username}`);
+            const data = {
+                token: this.token,
+                user: { ...userRes.user }
+            };
+            return data;
+        } catch (error) {
+            throw new Error(`Authentication failed: ${error}`);
+        };
+    };
+
+    /** attempt registration */
+    async register(data) {
+        const { username, password, firstName, lastName, email } = data;
+        try {
+            let res = await this.request(`auth/register`, { username, password, firstName, lastName, email }, 'post');
+            console.log('skilletApi res')
+            console.log(res);
+            return res;
+        } catch (error) {
+            throw new Error(`Registration failed: ${error}`);
+        };
+    };
+
+    /** attempt user info update */
+    async update(data) {
+        const { username, firstName, lastName, email } = data;
+        try {
+            let res = await this.request(`users/${username}`, { firstName, lastName, email }, 'patch');
+            return res;
+        } catch (error) {
+            throw new Error(`Update failed: ${error}`);
+        };
     };
 };

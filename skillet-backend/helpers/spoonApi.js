@@ -47,7 +47,7 @@ class SpoonApi {
             searchType.type = data.query;
         } else if (cuisineTypes.includes(data.query)){
             searchType.cuisine = data.query;
-        } else if (dietsTypes.includes(data.queryta)) {
+        } else if (dietsTypes.includes(data.query)) {
             searchType.diet = data.query;
         } else {
             searchType.query = data.query;

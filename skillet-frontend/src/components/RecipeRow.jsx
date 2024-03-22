@@ -4,8 +4,8 @@ import { useRef, useState } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
-import ViewMoreCard from './ViewMoreCard';
 import RecipeCard from './RecipeCard';
+import { useNavigate } from 'react-router-dom';
 
 
 const ScrollContainer = styled('div')(({ theme }) => ({
@@ -33,6 +33,7 @@ export default function RecipeRow(recipeData) {
     const recipesData = recipeData.recipes;
     const scrollContainerRef = useRef(null);
     const theme = useTheme();
+    const navigateTo = useNavigate();
     const isBiggerThanExtraSmall = useMediaQuery(theme.breakpoints.up('sm'));
 
     const scrollToRight = () => {
@@ -54,23 +55,37 @@ export default function RecipeRow(recipeData) {
         }
     };
 
+    function searchRcipes() {
+        navigateTo(`/search/${recipesData.type}`);
+    }
+
     return (
-        <Box sx={{ display: 'flex', marginTop: '3%', flexDirection: 'column', maxWidth: '90%' }}>
-            <Typography
-                variant='h5'
-                sx={{ fontWeight: 'bolder', fontSize: { xs: '1.66rem', sm: '1.75rem' }, marginBottom: '0px', padding: '0px' }}
-            >
-                {`${recipesData.type.charAt(0).toUpperCase() + recipesData.type.slice(1)} recipes`}
-            </Typography>
+        <Box sx={{ display: 'flex', marginTop: '2rem', marginBottom: '2rem', flexDirection: 'column', maxWidth: '90%' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Typography
+                    variant='h5'
+                    sx={{ fontWeight: 'bolder', fontSize: { xs: '1.66rem', sm: '1.75rem' }, marginBottom: '0px', padding: '0px' }}
+                >
+                    {`${recipesData.type.charAt(0).toUpperCase() + recipesData.type.slice(1)} recipes`}
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                    <ButtonBase onClick={searchRcipes} sx={{ borderRadius: '5px' }}>
+                        <Typography
+                            sx={{ marginRight: '5px', fontWeight: 'bold' }}
+                        >
+                            View more
+                        </Typography>
+                    </ButtonBase>
+                    {isBiggerThanExtraSmall && <ButtonBase onClick={scrollToLeft}><ArrowCircleLeftIcon sx={{ fontSize: '1.48rem' }} /></ButtonBase>}
+                    {isBiggerThanExtraSmall && <ButtonBase onClick={scrollToRight}><ArrowCircleRightIcon sx={{ fontSize: '1.5rem' }} /></ButtonBase>}
+                </Box>
+            </Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', marginTop: '0px' }}>
-                {isBiggerThanExtraSmall && <ButtonBase onClick={scrollToLeft}><ArrowCircleLeftIcon sx={{ fontSize: '2rem', marginRight: '20px' }} /></ButtonBase>}
                 <ScrollContainer ref={scrollContainerRef}>
                     {recipesData.recipes.map(recipe => {
                         return <RecipeCard recipeData={recipe} key={recipe.id} />
                     })}
-                    <ViewMoreCard type={recipesData.type} />
                 </ScrollContainer>
-                {isBiggerThanExtraSmall && <ButtonBase onClick={scrollToRight}><ArrowCircleRightIcon sx={{ fontSize: '2rem', marginLeft: '20px' }} /></ButtonBase>}
             </Box>
         </Box>
     );
