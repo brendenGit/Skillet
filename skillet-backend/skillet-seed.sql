@@ -41,3 +41,7 @@ VALUES
   (1, 2, 'Ground Beef', 1.50, 'lbs'),
   (2, 3, 'Potato Chips', 1.00, 'bag'),
   (2, 4, 'Salsa', 16.00, 'oz');
+
+-- seed usage
+INSERT INTO quota_usage (usage)
+VALUES (0);

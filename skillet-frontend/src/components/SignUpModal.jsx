@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import SignUpForm from './SignUpForm';
 
+
 const style = {
     position: 'absolute',
     top: '50%',

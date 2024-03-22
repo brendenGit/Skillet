@@ -1,7 +1,3 @@
-import * as React from 'react';
-import { useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { Button, Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import RatingStars from '../components/RatingStars';
 import BubbleSection from '../components/BubbleSection';
@@ -16,6 +12,9 @@ import Rate from '../components/Rate';
 import LoadingModal from '../components/LoadingModal';
 import SaveRecipeBtn from '../components/SaveRecipeBtn';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Button, Box, Typography } from '@mui/material';
 
 
 export default function Recipe() {

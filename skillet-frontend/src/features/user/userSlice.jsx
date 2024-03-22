@@ -1,8 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
+import storage from 'redux-persist/lib/storage';
+import { persistReducer } from 'redux-persist';
+
 
 const initialState = {
     username: null,
-    isFetching: false
+    isFetching: false,
+    justLoggedIn: false,
 }
 
 const userSlice = createSlice({
@@ -11,6 +15,9 @@ const userSlice = createSlice({
     reducers: {
         setIsFetching(state, action) {
             state.isFetching = action.payload;
+        },
+        setJustLoggedIn(state, action) {
+            state.justLoggedIn = action.payload
         },
         updateUserOnLogin(state, action) {
             state.userId = action.payload.id
@@ -32,5 +39,20 @@ const userSlice = createSlice({
     }
 })
 
-export const { updateUserOnLogin, setIsFetching, updateRatedRecipes, updateSavedRecipes } = userSlice.actions;
-export default userSlice.reducer;
+const userPersistConfig = {
+    key: 'user',
+    storage,
+};
+
+const persistedUserReducer = persistReducer(userPersistConfig, userSlice.reducer);
+
+export const { 
+    updateUserOnLogin, 
+    setIsFetching, 
+    updateRatedRecipes, 
+    updateSavedRecipes, 
+    updateUserOnLogout,
+    setJustLoggedIn,
+} = userSlice.actions;
+
+export default persistedUserReducer;

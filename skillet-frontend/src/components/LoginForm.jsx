@@ -7,44 +7,44 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import SkilletApi from '../utils/SkilletApi.cjs';
+import { updateUserOnLogin, setIsFetching, setJustLoggedIn } from '../features/user/userSlice';
 import { Navigate, useNavigate, Link } from 'react-router-dom';
 import { useState } from "react";
 import { useDispatch } from 'react-redux';
 
 
-export default function LoginForm({ user }) {
-    // component prep
+export default function LoginForm() {
     const [errorMessage, setErrorMessage] = useState(null);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // if logged in redirect to home page - do not allow LoginForm to be viewed 
-    //   if (user.firstName) {
-    //     return <Navigate to="/" replace={true} />;
-    //   }
-
-    // handle submit - login request
     async function handleSubmit(event) {
         event.preventDefault();
-        console.log('test')
         const data = new FormData(event.currentTarget);
+        const skilletApi = new SkilletApi();
         try {
-          setErrorMessage('');
-          dispatch(setIsFetching(true));
-          const { token, user } = await joblyApi.login({
-            username: data.get('username'),
-            password: data.get('password'),
-          });
+            setErrorMessage('');
+            dispatch(setIsFetching(true));
+            const { token, username, id, isAdmin } = await skilletApi.login({
+                username: data.get('username'),
+                password: data.get('password'),
+            });
 
-          dispatch(setUserDataOnLogin({
-            token,
-            user,
-          }))
-          dispatch(setIsFetching(false));
-          navigate("/");
+            const savedRecipes = await skilletApi.getSaved(username);
+            const ratedRecipes = await skilletApi.getRated(username);
+            console.log(savedRecipes);
+            console.log(ratedRecipes);
 
+            dispatch(updateUserOnLogin({
+                token,
+                username,
+                id,
+                isAdmin
+            }))
+            dispatch(setIsFetching(false));
+            dispatch(setJustLoggedIn(true));
         } catch (error) {
-          setErrorMessage(error.message);
+            setErrorMessage(error.message);
         }
     }
 
@@ -100,15 +100,15 @@ export default function LoginForm({ user }) {
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={{ 
-                            mt: 3, 
-                            mb: 2, 
-                            bgcolor: '#FDFD96', 
+                        sx={{
+                            mt: 3,
+                            mb: 2,
+                            bgcolor: '#FDFD96',
                             color: 'black',
                             '&:hover': {
-                                bgcolor: '#FDFD96', // Set the same background color on hover
+                                bgcolor: '#FDFD96',
                                 color: 'black'
-                              }
+                            }
                         }}
                     >
                         Login

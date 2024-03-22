@@ -67,7 +67,7 @@ class User {
         isAdmin
       ],
     );
-    
+
     return result.rows[0];
   }
 
@@ -85,7 +85,6 @@ class User {
       `SELECT id,
               username,
               password,
-              first_name AS "firstName",
               is_admin AS "isAdmin"
            FROM users
            WHERE username = $1`,
@@ -99,7 +98,7 @@ class User {
       const isValid = await bcrypt.compare(password, user.password);
       if (isValid === true) {
         delete user.password;
-        return user;
+        return { ...user };
       }
     }
 
@@ -158,7 +157,7 @@ class User {
         lastName: "last_name",
         isAdmin: "is_admin"
       });
-      
+
     const usernameVarIdx = "$" + (values.length + 1);
 
     const querySql = `UPDATE users 

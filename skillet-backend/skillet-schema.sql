@@ -48,6 +48,11 @@ CREATE TABLE recipe_in_grocery_list (
   UNIQUE (grocery_list_id, recipe_id)
 );
 
+CREATE TABLE quota_usage (
+  id SERIAL PRIMARY KEY,
+  usage INTEGER NOT NULL DEFAULT 0
+);
+
 CREATE INDEX idx_user_username ON users(username);
 CREATE INDEX idx_recipesaved_saved_by ON recipe_saved(saved_by);
 CREATE INDEX idx_grocerylist_created_by ON grocery_lists(created_by);

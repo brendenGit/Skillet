@@ -1,9 +1,9 @@
 "use strict";
-/** Database setup for jobly. */
-const { Client } = require("pg");
+
+const { Pool } = require("pg");
 const { getDatabaseUri } = require("./config.js");
 
-const db = new Client(getDatabaseUri());
-db.connect();
+const dbConfig = getDatabaseUri();
+const db = new Pool(dbConfig);
 
 module.exports = db;

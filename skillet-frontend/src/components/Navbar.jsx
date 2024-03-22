@@ -1,4 +1,3 @@
-import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -11,10 +10,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import LoginModal from './LoginModal';
 import SignUpModal from './SignUpModal';
-import { updateUserOnLogin } from '../features/user/userSlice';
+import CommonSnackbar from './CommonSnackbar';
+import { updateUserOnLogout, setJustLoggedIn } from '../features/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 
 
@@ -47,27 +47,48 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-const pages = {
-    noUser: [
-        { key: 'loginModal', component: <LoginModal /> },
-        { key: 'signUpModal', component: <SignUpModal /> }
-    ],
-    loggedIn: [
-        { key: 'savedRecipes', label: 'Saved Recipes', path: '/saved-recipes' },
-        { key: 'groceryLists', label: 'Grocery Lists', path: '/grocery-lists' },
-        { key: 'account', label: 'Account', path: '/account' }
-    ]
-};
-
-export default function Navbar({ user }) {
-    const navigateTo = useNavigate();
-    console.log(user)
-    useEffect(() => {
-        console.log('user logged in');
-    }, [user]);
-
-    const [anchorEl, setAnchorEl] = React.useState(null);
+export default function Navbar() {
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [anchorEl, setAnchorEl] = useState(null);
     const isMenuOpen = Boolean(anchorEl);
+
+    const user = useSelector(state => state.user);
+
+    const navigateTo = useNavigate();
+    const dispatch = useDispatch();
+
+    if(user.justLoggedIn) {
+        setSnackbarMessage(`Welcome back ${user.username}`);
+        setSnackbarOpen(true);
+        dispatch(setJustLoggedIn(false));
+    }
+
+    const handleLogout = () => {
+        dispatch(updateUserOnLogout());
+        setSnackbarMessage(`You have successfully logged out.`);
+        setSnackbarOpen(true);
+    };
+
+    const handleSnackbarClose = (reason) => {
+        if (reason === 'clickaway') {
+            return;
+          }
+        setSnackbarOpen(false);
+    };
+
+    const pages = {
+        noUser: [
+            { key: 'loginModal', component: <LoginModal /> },
+            { key: 'signUpModal', component: <SignUpModal /> }
+        ],
+        loggedIn: [
+            { key: 'savedRecipes', label: 'Saved Recipes', path: '/saved-recipes' },
+            { key: 'groceryLists', label: 'Grocery Lists', path: '/grocery-lists' },
+            { key: 'account', label: 'Account', path: '/account' },
+            { key: 'logout', label: 'Log Out', onClick: handleLogout }
+        ]
+    };
 
     const handleProfileMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -75,6 +96,11 @@ export default function Navbar({ user }) {
 
     const handleMenuClose = () => {
         setAnchorEl(null);
+    };
+
+    const linkStyle = {
+        textDecoration: 'none',
+        color: 'inherit', // Optional: to inherit text color from parent
     };
 
     let renderPages = user.username ? pages.loggedIn : pages.noUser;
@@ -97,7 +123,7 @@ export default function Navbar({ user }) {
         >
             {renderPages.map((item) => (
                 <MenuItem key={item.key} onClick={handleMenuClose}>
-                    {item.component || <Link to={item.path}>{item.label}</Link>}
+                    {item.component || <Link to={item.path} onClick={item.onClick} style={linkStyle}>{item.label}</Link>}
                 </MenuItem>
             ))}
         </Menu>
@@ -145,6 +171,12 @@ export default function Navbar({ user }) {
                 </Box>
             </Toolbar>
             {renderMenu}
+            <CommonSnackbar
+                open={snackbarOpen}
+                autoHideDuration={5000}
+                message={snackbarMessage}
+                onClose={handleSnackbarClose}
+            />
         </AppBar>
     );
 }

@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import LoginForm from './LoginForm';
 
+
 const style = {
     position: 'absolute',
     top: '50%',
@@ -30,7 +31,7 @@ export default function LoginModal() {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-                    <LoginForm />
+                    <LoginForm handleClose={handleClose} />
                 </Box>
             </Modal>
         </div>

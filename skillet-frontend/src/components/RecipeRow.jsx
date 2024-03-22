@@ -71,6 +71,7 @@ export default function RecipeRow(recipeData) {
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                     <ButtonBase onClick={searchRcipes} sx={{ borderRadius: '5px' }}>
                         <Typography
+                            variant='p'
                             sx={{ marginRight: '5px', fontWeight: 'bold' }}
                         >
                             View more

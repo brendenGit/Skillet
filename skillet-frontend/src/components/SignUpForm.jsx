@@ -18,12 +18,6 @@ export default function SignUpForm({ handleClose }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // if logged in redirect to home page - do not allow SignUpForm to be viewed 
-    //   if (user.firstName) {
-    //     return <Navigate to="/" replace={true} />;
-    //   }
-
-    // handle submit - registration attempt - redirect and sign in if successful
     async function handleSubmit(event) {
         event.preventDefault();
         console.log('testing sign up');
@@ -142,7 +136,7 @@ export default function SignUpForm({ handleClose }) {
                             bgcolor: '#FDFD96',
                             color: 'black',
                             '&:hover': {
-                                bgcolor: '#FDFD96', // Set the same background color on hover
+                                bgcolor: '#FDFD96',
                                 color: 'black'
                             }
                         }}

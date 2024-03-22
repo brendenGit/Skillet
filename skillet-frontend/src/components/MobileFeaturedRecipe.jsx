@@ -39,7 +39,7 @@ export default function MobileFeaturedRecipe({ recipeData }) {
                         <ButtonBase sx={{ borderRadius: '5px' }} onClick={goToRecipe}>
                             <Typography
                                 variant='p'
-                                sx={{ marginRight: '5px' }}
+                                sx={{ marginRight: '5px', fontWeight: 'bold' }}
                             >
                                 Go to Recipe
                             </Typography>

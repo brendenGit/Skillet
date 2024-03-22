@@ -16,6 +16,7 @@ const SpoonApi = require("../../helpers/spoonApi.js");
 
 const router = express.Router();
 
+
 /** GET gets all saved recipes savedRecipes => { savedRecipes: [recipeId, recipeId, ...] }
  *
  * @recipeId is an Integer
@@ -27,7 +28,10 @@ const router = express.Router();
 router.get("/random", async function (req, res, next) {
   try {
     const recipes = await SpoonApi.getRandomRecipes({ number: 5, ...req.query });
-    return res.json({ recipes });
+    if (recipes.overQuota) {
+      return res.status(429).json({ message: 'Daily quota limit reached. Please try again tomorrow.' });
+    }
+    return res.status(200).json({ recipes });
   } catch (err) {
     return next(err);
   }
@@ -43,7 +47,10 @@ router.get("/random", async function (req, res, next) {
 router.get("/search", async function (req, res, next) {
   try {
     const recipes = await SpoonApi.getRecipes({ number: 18, ...req.query });
-    return res.json({ recipes });
+    if (recipes.overQuota) {
+      return res.status(429).json({ message: 'Daily quota limit reached. Please try again tomorrow.' });
+    }
+    return res.status(200).json({ recipes });
   } catch (err) {
     return next(err);
   }
@@ -58,9 +65,11 @@ router.get("/search", async function (req, res, next) {
 
 router.get("/featured", async function (req, res, next) {
   try {
-    console.log('inside featured')
     const featuredRecipe = await SpoonApi.getRecipeInfo(FEATURED_RECIPE_ID);
-    return res.json({ featuredRecipe });
+    if (featuredRecipe.overQuota) {
+      return res.status(429).json({ message: 'Daily quota limit reached. Please try again tomorrow.' });
+    }
+    return res.status(200).json({ featuredRecipe });
   } catch (err) {
     return next(err);
   }
@@ -75,11 +84,13 @@ router.get("/featured", async function (req, res, next) {
  **/
 
 router.get("/:recipeId/info", async function (req, res, next) {
-  console.log('inside get recipe route')
   try {
     const recipeId = req.params.recipeId;
     const recipe = await SpoonApi.getRecipeInfo(recipeId);
-    return res.json({ recipe });
+    if (recipe.overQuota) {
+      return res.status(429).json({ message: 'Daily quota limit reached. Please try again tomorrow.' });
+    }
+    return res.status(200).json({ recipe });
   } catch (err) {
     return next(err);
   }
@@ -208,20 +219,5 @@ router.delete("/:username/saved/:recipeId", ensureCorrectUserOrAdmin, async func
     return next(err);
   }
 });
-
-/** DELETE /[username]  =>  { deleted: username }
- *
- * Authorization required: admin or same-user-as-:username
- **/
-
-router.delete("/:username", ensureCorrectUserOrAdmin, async function (req, res, next) {
-  try {
-    await User.remove(req.params.username);
-    return res.json({ deleted: req.params.username });
-  } catch (err) {
-    return next(err);
-  }
-});
-
 
 module.exports = router;

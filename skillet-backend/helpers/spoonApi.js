@@ -1,13 +1,28 @@
+"use strict";
+
 const axios = require('axios');
+const db = require('../db');
 require("dotenv").config();
 
-/** API Class.
- *
- * Static class tying together methods used to get/send to to the API.
- * There shouldn't be any frontend-specific stuff here, and there shouldn't
- * be any API-aware stuff elsewhere in the frontend.
- *
- */
+
+// Logic to handle API quota
+// get quota limit env var
+const DAILY_QUOTA_LIMIT = process.env.DAILY_QUOTA_LIMIT;
+
+// initialize global var
+let dailyRequestCount = 0;
+
+// get current daily usage
+(async () => {
+    try {
+        const result = await db.query('SELECT usage FROM quota_usage WHERE id = 1');
+        dailyRequestCount = result.rows[0].usage;
+        console.log(`Daily quota usage initialized to ${dailyRequestCount}`);
+    } catch (err) {
+        console.error('Error initializing daily quota usage:', err);
+    }
+})();
+
 
 const mealTypes = ['main course', 'side dish', 'dessert', 'appetizer', 'salad', 'bread', 'breakfast', 'soup', 'beverage', 'fingerfood', 'snack', 'drink']
 const cuisineTypes = ['african', 'asian', 'american', 'british', 'cajun', 'caribbean', 'chinese', 'eastern european', 'european', 'french', 'german', 'greek',
@@ -22,6 +37,18 @@ class SpoonApi {
     static RECIPE_INFO_URL = "https://api.spoonacular.com/recipes";
     static COMPLEX_SEARCH_URL = "https://api.spoonacular.com/recipes/complexSearch";
     static API_KEY = process.env.SPOON_API_KEY;
+
+    static overQuota() {
+        if (dailyRequestCount >= DAILY_QUOTA_LIMIT) {
+            return true;
+        }
+        return false;
+    }
+
+    static async updateUsage(used) {
+        const result = await db.query('UPDATE quota_usage SET usage = $1 WHERE id = 1 RETURNING usage;', [used]);
+        dailyRequestCount = result.rows[0].usage;
+    }
 
     /** makes call to spoon api to get data on multiple recipes
      * 
@@ -41,11 +68,15 @@ class SpoonApi {
      * 
      */
     static async getRecipes(data) {
+        if (SpoonApi.overQuota()) {
+            return { overQuota: 'over quota' };
+        }
+
         console.debug("SPOON API Call:");
         let searchType = {};
         if (mealTypes.includes(data.query)) {
             searchType.type = data.query;
-        } else if (cuisineTypes.includes(data.query)){
+        } else if (cuisineTypes.includes(data.query)) {
             searchType.cuisine = data.query;
         } else if (dietsTypes.includes(data.query)) {
             searchType.diet = data.query;
