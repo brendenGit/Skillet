@@ -32,14 +32,14 @@ export default function LoginForm() {
 
             const savedRecipes = await skilletApi.getSaved(username);
             const ratedRecipes = await skilletApi.getRated(username);
-            console.log(savedRecipes);
-            console.log(ratedRecipes);
 
             dispatch(updateUserOnLogin({
                 token,
                 username,
                 id,
-                isAdmin
+                isAdmin,
+                ratedRecipes: [...savedRecipes.savedRecipes],
+                savedRecipes: [...ratedRecipes.ratedRecipes],
             }))
             dispatch(setIsFetching(false));
             dispatch(setJustLoggedIn(true));

@@ -5,6 +5,8 @@ const db = require('../db');
 require("dotenv").config();
 
 
+
+
 // Logic to handle API quota
 // get quota limit env var
 const DAILY_QUOTA_LIMIT = process.env.DAILY_QUOTA_LIMIT;
@@ -91,7 +93,10 @@ class SpoonApi {
                 params: { apiKey: SpoonApi.API_KEY, ...params }
             });
             console.debug("Request URL:", url);
+
             const resp = await axios.get(url)
+            SpoonApi.updateUsage(parseFloat(resp.headers['x-api-quota-used']));
+
             const recipeData = await SpoonApi.getRecipeStats(resp.data.results)
             return recipeData;
         } catch (err) {
@@ -119,6 +124,10 @@ class SpoonApi {
      * 
      */
     static async getRandomRecipes(data) {
+        if (SpoonApi.overQuota()) {
+            return { overQuota: 'over quota' };
+        }
+
         console.debug("SPOON API Call:");
         try {
             const params = SpoonApi.buildParamsForRandom(data);
@@ -127,9 +136,39 @@ class SpoonApi {
                 params: { apiKey: SpoonApi.API_KEY, ...params }
             });
             console.debug("Request URL:", url);
-            const resp = await axios.get(url)
+
+            const resp = await axios.get(url);
+            SpoonApi.updateUsage(parseFloat(resp.headers['x-api-quota-used']));
+
             const recipeData = await SpoonApi.getRecipeStats(resp.data.recipes)
             return recipeData;
+        } catch (err) {
+            console.error("API Error:", err.response);
+            let message = err.response.data.error.message;
+            throw Array.isArray(message) ? message : [message];
+        };
+    };
+
+    /** makes call to spoon api to get recipe data */
+    static async getRecipeInfo(recipeId) {
+        if (SpoonApi.overQuota()) {
+            return { overQuota: 'over quota' };
+        }
+
+        console.debug("SPOON API Call:");
+        try {
+            const url = axios.getUri({
+                url: `${SpoonApi.RECIPE_INFO_URL}/${recipeId}/information`,
+                params: { apiKey: SpoonApi.API_KEY }
+            });
+            console.debug("Request URL:", url);
+
+            const resp = await axios.get(url);
+            SpoonApi.updateUsage(parseFloat(resp.headers['x-api-quota-used']));
+
+            const cleanedData = await SpoonApi.cleanRecipeInfo(resp.data);
+            const finalRecipeData = await SpoonApi.getRecipeStats([cleanedData]);
+            return finalRecipeData;
         } catch (err) {
             console.error("API Error:", err.response);
             let message = err.response.data.error.message;
@@ -173,26 +212,6 @@ class SpoonApi {
             throw Array.isArray(message) ? message : [message];
         }
     }
-
-    /** makes call to spoon api to get recipe data */
-    static async getRecipeInfo(recipeId) {
-        console.debug("SPOON API Call:");
-        try {
-            const url = axios.getUri({
-                url: `${SpoonApi.RECIPE_INFO_URL}/${recipeId}/information`,
-                params: { apiKey: SpoonApi.API_KEY }
-            });
-            console.debug("Request URL:", url);
-            const rawRecipeData = await axios.get(url)
-            const cleanedData = await SpoonApi.cleanRecipeInfo(rawRecipeData.data);
-            const finalRecipeData = await SpoonApi.getRecipeStats([cleanedData]);
-            return finalRecipeData;
-        } catch (err) {
-            console.error("API Error:", err.response);
-            let message = err.response.data.error.message;
-            throw Array.isArray(message) ? message : [message];
-        };
-    };
 
     /** cleans data structure after receiving recipe info */
     // need data in this form for ingredients { ingredientId: int, ingredientName: string, amount: int, unit: string, consistency: string (@SOLID OR @LIQUID) }

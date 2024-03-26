@@ -7,23 +7,29 @@ import parse from 'html-react-parser';
 import RatingStars from './RatingStars';
 import Box from '@mui/material/Box';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import SaveRecipeBtn from './SaveRecipeBtn';
+import { useSelector, useDispatch } from 'react-redux';
 import { CardActionArea, ButtonBase } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 
 export default function MobileFeaturedRecipe({ recipeData }) {
     const navigateTo = useNavigate();
+    const user = useSelector((state) => state.user);
 
     function goToRecipe() {
         navigateTo(`/recipes/${recipeData.title}`, { state: { recipeData } });
     }
 
+    console.log(user);
+
+    // const isSaved = user.username ? user.savedRecipes.includes(recipeData.id) : false;
+
     function minimizeSummary(str, maxLength) {
         return str.slice(0, maxLength);
     }
 
-    const reducedRecipeSummary = parse(minimizeSummary(recipeData.summary, 250)); // truncate at 200 characters
+    const reducedRecipeSummary = parse(minimizeSummary(recipeData.summary, 250));
 
     return (
         <>
@@ -63,12 +69,7 @@ export default function MobileFeaturedRecipe({ recipeData }) {
                         <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: '3%' }}>
                             <RatingStars rating={recipeData.rating} />
                             <Box sx={{ marginLeft: '5%', display: 'flex', flexDirection: 'row' }}>
-                                <ButtonBase sx={{ marginTop: '-30%' }}>
-                                    <BookmarkBorderIcon />
-                                    <Typography variant='h7'>
-                                        {recipeData.saveCount}
-                                    </Typography>
-                                </ButtonBase>
+                                <SaveRecipeBtn saved={false} saveCount={recipeData.saveCount} recipeId={recipeData.id} />
                             </Box>
                         </Box>
                         <Typography variant="body2" color="text.secondary" component="div" sx={{ lineHeight: '1.33' }}>

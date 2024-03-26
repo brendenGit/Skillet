@@ -11,6 +11,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import LoginModal from './LoginModal';
 import SignUpModal from './SignUpModal';
 import CommonSnackbar from './CommonSnackbar';
+import Avatar from '@mui/material/Avatar';
 import { updateUserOnLogout, setJustLoggedIn } from '../features/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
@@ -58,7 +59,7 @@ export default function Navbar() {
     const navigateTo = useNavigate();
     const dispatch = useDispatch();
 
-    if(user.justLoggedIn) {
+    if (user.justLoggedIn) {
         setSnackbarMessage(`Welcome back ${user.username}`);
         setSnackbarOpen(true);
         dispatch(setJustLoggedIn(false));
@@ -73,7 +74,7 @@ export default function Navbar() {
     const handleSnackbarClose = (reason) => {
         if (reason === 'clickaway') {
             return;
-          }
+        }
         setSnackbarOpen(false);
     };
 
@@ -166,7 +167,9 @@ export default function Navbar() {
                         onClick={handleProfileMenuOpen}
                         color="inherit"
                     >
-                        <AccountCircle sx={{ color: 'black', fontSize: '2rem' }} />
+                        {!user.username && <AccountCircle sx={{ color: 'black', fontSize: '2rem' }} />}
+                        {user.username && <Avatar alt="avatar">{user.username[0]}</Avatar>
+                        }
                     </IconButton>
                 </Box>
             </Toolbar>

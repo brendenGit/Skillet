@@ -130,13 +130,7 @@ router.get("/:username/rated", ensureCorrectUserOrAdmin, async function (req, re
   }
 });
 
-/** GET gets all saved recipes savedRecipes => { savedRecipes: [recipeId, recipeId, ...] }
- *
- * @recipeId is an Integer
- * Returns { savedRecipes: [recipeId, recipeId, ...] }
- *
- * Authorization required: admin or correct user
- **/
+/** POST stats for recipes  */
 
 router.post("/stats", async function (req, res, next) {
   const recipes = req.body.recipes;
@@ -186,12 +180,13 @@ router.post("/:username/rate/:recipeId", ensureCorrectUserOrAdmin, async functio
 
 router.post("/:username/saved/:recipeId", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
+    console.log('inside save recipe server route')
     const validator = jsonschema.validate({ recipeId: parseInt(req.params.recipeId), username: req.params.username }, savedRecipeSchema);
     if (validator.errors.length > 0) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
-    const savedRecipe = await Recipe.save(req.params.recipeId, req.params.username);
+    const savedRecipe = await Recipe.save(req.params.recipeId, req.params.username);  
     return res.status(201).json(savedRecipe);
   } catch (err) {
     return next(err);

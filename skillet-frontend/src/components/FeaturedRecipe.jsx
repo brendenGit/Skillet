@@ -14,6 +14,9 @@ import { ButtonBase, CardActionArea } from '@mui/material';
 
 export default function FeaturedRecipe({ recipeData }) {
     const navigateTo = useNavigate();
+    const user = useSelector((state) => state.user);
+
+    const isSaved = user.username ? user.savedRecipes.includes(recipeData.id) : false;
 
     function goToRecipe() {
         navigateTo(`/recipes/${recipeData.title}`, { state: { recipeData } });
@@ -62,7 +65,7 @@ export default function FeaturedRecipe({ recipeData }) {
                         <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: '3%' }}>
                             <RatingStars rating={recipeData.rating} />
                             <Box sx={{ marginLeft: '5%', display: 'flex', flexDirection: 'row' }}>
-                                <SaveRecipeBtn saved={false} saveCount={recipeData.saveCount} />
+                                <SaveRecipeBtn saved={isSaved} saveCount={recipeData.saveCount} recipeId={recipeData.id} />
                             </Box>
                         </Box>
                         <Typography variant="p" color="text.secondary" component="div" sx={{ lineHeight: '1.33' }}>

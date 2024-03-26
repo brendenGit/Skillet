@@ -51,7 +51,7 @@ export default function RecipeCard({ recipeData, isOnSearchPage }) {
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '3%' }}>
                     <RatingStars rating={recipeData.rating} />
                     <Box sx={{ marginLeft: '5%', display: 'flex', flexDirection: 'row' }}>
-                        <SaveRecipeBtn saved={false} saveCount={recipeData.saveCount} />
+                        <SaveRecipeBtn saved={false} saveCount={recipeData.saveCount} recipeId={recipeData.id} />
                     </Box>
                 </Box>
             </CardContent>

@@ -9,6 +9,7 @@ export default class SkilletApi {
     }
 
     async request(endpoint, data = {}, method = "get") {
+        console.log('inside request');
         console.debug("API Call:", endpoint, data, method);
 
         const url = `${BASE_URL}/${endpoint}`;
@@ -72,6 +73,28 @@ export default class SkilletApi {
             throw new Error(`Failed to recipes: ${error}`);
         };
     };
+
+    /** get search recipes */
+    async saveRecipe(username, recipeId) {
+        try {
+            console.log('inside save recipe')
+            let savedRecipe = await this.request(`recipes/${username}/saved/${recipeId}`, {}, "POST");
+            return savedRecipe;
+        } catch (error) {
+            throw new Error(`Failed to recipes: ${error}`);
+        };
+    };
+
+    /** get search recipes */
+    async removeSavedRecipe(username, recipeId) {
+        try {
+            let removedSavedRecipe = await this.request(`recipes/${username}/saved/${recipeId}`, {}, "DELETE");
+            return removedSavedRecipe;
+        } catch (error) {
+            throw new Error(`Failed to recipes: ${error}`);
+        };
+    };
+
 
 
     /** Users */

@@ -50,7 +50,7 @@ CREATE TABLE recipe_in_grocery_list (
 
 CREATE TABLE quota_usage (
   id SERIAL PRIMARY KEY,
-  usage INTEGER NOT NULL DEFAULT 0
+  usage REAL NOT NULL DEFAULT 0
 );
 
 CREATE INDEX idx_user_username ON users(username);
