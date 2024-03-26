@@ -1,4 +1,55 @@
-# Skillet - Prep
+# Skillet
+
+## Overview
+Skillet is a full-stack application that allows users to explore, save, and rate recipes. The backend is built with Node.js and Express, while the frontend is powered by Vite.
+
+## Getting Started
+
+### Prerequisites
+- Node.js
+- PostgreSQL
+- A Spoonacular API key (obtain one from [Spoonacular](https://spoonacular.com/))
+
+### Setting Up the Backend
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/skillet.git
+   cd skillet/backend
+2. ```bash
+   cd skillet-backend
+   npm install
+   psql < skillet.sql
+4. Set up environmental variables
+    ### For development
+    DB_USER=your_psql_username
+    DB_PASSWORD=your_psql_password
+    DB_HOST=localhost
+    DB_PORT=5432
+    DB_NAME=skillet
+    
+    ### For testing
+    DB_TEST_NAME=skillet_test
+    
+    SPOON_API_KEY=your_spoonacular_api_key
+    FEATURED_RECIPE_ID=637876
+    DAILY_QUOTA_LIMIT=1500
+
+5. ```bash
+   node server.js
+6. The backend is ready to go. The cloned repo should have 100% test coverage checked with npm test (uses Jest)
+   ```bash
+   npm test
+   
+### Setting Up the Frontend
+1. ```bash
+   cd skillet-frontend
+   npm install
+   npm run dev
+
+## Contributing
+Contributions are welcome! Please feel free to submit a pull request.
+
 ## Tech Stack
 - **Frontend**: React.js , React Native
 - **Backend**: Node.js, Express.js , might also incorporate MongoDB
