@@ -25,6 +25,8 @@ export default function RecipeCard({ recipeData, isOnSearchPage }) {
         navigateTo(`/recipes/${recipeData.title}`, { state: { recipeData } });
     }
 
+    console.log(recipeData);
+
     return (
         <Card sx={{ minWidth: '350px', maxWidth: '350px', marginRight: isOnSearchPage && !isBiggerThanExtraSmall ? '0' : '2rem' }} elevation={0}>
             <CardActionArea onClick={goToRecipe}>

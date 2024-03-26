@@ -27,7 +27,10 @@ describe("POST /auth/token", function () {
           password: "password1",
         });
     expect(resp.body).toEqual({
+      "id": expect.any(Number),
+      "isAdmin": false,
       "token": expect.any(String),
+      "username": "u1"
     });
   });
 
@@ -86,12 +89,10 @@ describe("POST /auth/register", function () {
         });
     expect(resp.statusCode).toEqual(201);
     expect(resp.body).toEqual({
-      user: {
-        username: "new",
-        firstName: "first",
-        id: expect.any(Number),
-        isAdmin: false,
-      }, token: expect.any(String),
+      "id": expect.any(Number),
+      "isAdmin": false,
+      "token": expect.any(String),
+      "username": "new"
     });
   });
 

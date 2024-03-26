@@ -6,6 +6,7 @@ const db = require("../../db.js");
 const app = require("../../app.js");
 const Recipe = require("../../models/recipe/recipe.js");
 
+
 const {
   commonBeforeAll,
   commonBeforeEach,
@@ -41,7 +42,7 @@ describe("POST /rate", function () {
       .set("authorization", `Bearer ${u1Token}`);
     expect(resp.statusCode).toEqual(401);
   });
-  
+
   test("unauth for non-admin and not correct user", async function () {
     const resp = await request(app)
       .post("/recipes/u2/rate/2")
@@ -177,14 +178,14 @@ describe("POST /stats", function () {
     const resp = await request(app)
       .post("/recipes/stats")
       .send({
-        recipeIds: [1, 2, 3, 4]
+        recipes: [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }]
       });
     expect(resp.statusCode).toEqual(200);
     expect(resp.body).toEqual([
-      { "rating": 4, "recipeId": 1, "saveCount": 1 },
-      { "rating": 2, "recipeId": 2, "saveCount": 1 },
-      { "rating": 0, "recipeId": 3, "saveCount": 0 },
-      { "rating": 0, "recipeId": 4, "saveCount": 0 }
+      { "id": 1, "rating": 4, "saveCount": 1 },
+      { "id": 2, "rating": 2, "saveCount": 1 },
+      { "id": 3, "rating": 0, "recipeId": 3, "saveCount": 0 },
+      { "id": 4, "rating": 0, "recipeId": 4, "saveCount": 0 }
     ]);
   });
 });

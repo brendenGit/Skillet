@@ -27,7 +27,6 @@ export default function Recipe() {
 
     useEffect(() => {
         const fetchRecipeData = async () => {
-            console.log(location.state.recipeData.id)
             try {
                 const skilletApi = new SkilletApi();
                 const recipe = await skilletApi.getRecipe(location.state.recipeData.id);
@@ -56,7 +55,6 @@ export default function Recipe() {
                 <LoadingModal />
             ) : (
                 <>
-                    {console.log(recipeData)}
                     <BubbleSection />
                     <Box sx={{ display: 'flex', marginTop: 8 }}>
                         <Grid container rowSpacing={5} columnSpacing={1}>

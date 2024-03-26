@@ -19,7 +19,6 @@ let dailyRequestCount = 0;
     try {
         const result = await db.query('SELECT usage FROM quota_usage WHERE id = 1');
         dailyRequestCount = result.rows[0].usage;
-        console.log(`Daily quota usage initialized to ${dailyRequestCount}`);
     } catch (err) {
         console.error('Error initializing daily quota usage:', err);
     }
@@ -168,6 +167,7 @@ class SpoonApi {
 
             const cleanedData = await SpoonApi.cleanRecipeInfo(resp.data);
             const finalRecipeData = await SpoonApi.getRecipeStats([cleanedData]);
+            
             return finalRecipeData;
         } catch (err) {
             console.error("API Error:", err.response);
@@ -235,7 +235,7 @@ class SpoonApi {
             title: recipeData.title,
             sourceName: recipeData.sourceName,
             sourceUrl: recipeData.sourceUrl,
-            imageUrl: recipeData.image,
+            image: recipeData.image,
             summary: recipeData.summary,
             readyInMinutes: recipeData.readyInMinutes,
             servings: recipeData.servings,

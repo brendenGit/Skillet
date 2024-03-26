@@ -9,15 +9,18 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useState } from 'react';
 
 
-export default function SaveRecipeBtn({ saved, saveCount, isRecipe, recipeId }) {
+export default function SaveRecipeBtn({ saveCount, isRecipe, recipeId }) {
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user);
-    const [open, setOpen] = useState(false);
+
+    const saved = user.username ? user.savedRecipes.includes(recipeId) : false;
     const [isSaved, setIsSaved] = useState(saved);
     const [currSaveCount, setCurrSaveCount] = useState(saveCount);
 
+    // state to manage modal if user is not signed in
+    const [open, setOpen] = useState(false);
+
     const handleOpen = async () => {
-        console.log(typeof recipeId);
         if (!user.username) {
             setOpen(true);
         } else {
@@ -33,12 +36,9 @@ export default function SaveRecipeBtn({ saved, saveCount, isRecipe, recipeId }) 
                 };
             } else {
                 try {
-                    console.log('inside save recipe client side button')
                     await skilletApi.saveRecipe(user.username, recipeId);
                     setIsSaved(true);
                     setCurrSaveCount(currSaveCount + 1);
-                    const updatedRecipes = [...user.savedRecipes, recipedId];
-                    console.log(updatedRecipes);
                     dispatch(updateSavedRecipes([...user.savedRecipes, recipeId]));
                 } catch (error) {
                     throw new Error(`Failed to save recipe`);

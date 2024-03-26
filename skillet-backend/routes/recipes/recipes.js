@@ -180,13 +180,12 @@ router.post("/:username/rate/:recipeId", ensureCorrectUserOrAdmin, async functio
 
 router.post("/:username/saved/:recipeId", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
-    console.log('inside save recipe server route')
     const validator = jsonschema.validate({ recipeId: parseInt(req.params.recipeId), username: req.params.username }, savedRecipeSchema);
     if (validator.errors.length > 0) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
-    const savedRecipe = await Recipe.save(req.params.recipeId, req.params.username);  
+    const savedRecipe = await Recipe.save(req.params.recipeId, req.params.username);
     return res.status(201).json(savedRecipe);
   } catch (err) {
     return next(err);
@@ -208,6 +207,8 @@ router.delete("/:username/saved/:recipeId", ensureCorrectUserOrAdmin, async func
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
+    console.log(req.params.recipeId);
+    console.log(req.params.username);
     const removedRecipe = await Recipe.removeSaved(req.params.recipeId, req.params.username);
     return res.status(201).json(removedRecipe);
   } catch (err) {

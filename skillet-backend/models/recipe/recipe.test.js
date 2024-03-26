@@ -51,13 +51,13 @@ describe("getRated", function () {
 
 describe("getStats", function () {
   test("works", async function () {
-    const recipeStats = await Recipe.getStats("1");
-    expect(recipeStats).toEqual({ "rating": 4, "recipeId": 1, "saveCount": 5 });
+    const recipeStats = await Recipe.getStats({ id: 1 });
+    expect(recipeStats).toEqual({ "id": 1, "rating": 4, "saveCount": 5 });
   });
 
   test("creates new stats if none found", async function () {
-    const recipeStats = await Recipe.getStats("4");
-    expect(recipeStats).toEqual({ "rating": 0, "recipeId": 4, "saveCount": 0 });
+    const recipeStats = await Recipe.getStats({ id: 4 });
+    expect(recipeStats).toEqual({ "id": 4, "rating": 0, "recipeId": 4, "saveCount": 0 });
   });
 });
 

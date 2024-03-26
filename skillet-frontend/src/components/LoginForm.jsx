@@ -40,7 +40,8 @@ export default function LoginForm() {
                 isAdmin,
                 ratedRecipes: [...savedRecipes.savedRecipes],
                 savedRecipes: [...ratedRecipes.ratedRecipes],
-            }))
+            }));
+
             dispatch(setIsFetching(false));
             dispatch(setJustLoggedIn(true));
         } catch (error) {

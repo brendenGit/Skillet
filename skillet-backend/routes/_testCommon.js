@@ -41,8 +41,8 @@ async function commonBeforeAll() {
   });
 
   //create recipe stats
-  await Recipe.getStats(1);
-  await Recipe.getStats(2);
+  await Recipe.createStats(1);
+  await Recipe.createStats(2);
 
   // create saved recipes
   await Recipe.save(1, 'u1');

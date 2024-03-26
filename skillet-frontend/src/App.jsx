@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Search from './pages/Search';
 import Recipe from './pages/Recipe';
-import { useDispatch, useSelector } from 'react-redux';
+import SavedRecipes from './pages/SavedRecipes';
+import GroceryLists from './pages/GroceryLists';
+import { useSelector } from 'react-redux';
+
 
 function App() {
   const user = useSelector((state) => state.user);
@@ -16,6 +18,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/search/:query" element={<Search />} />
         <Route path="/recipes/:recipeTitle" element={<Recipe />} />
+        <Route path="/saved-recipes" element={<SavedRecipes />} />
+        <Route path="/grocery-lists" element={<GroceryLists />} />
       </Routes>
     </Router>
   );

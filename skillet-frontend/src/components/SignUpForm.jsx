@@ -7,20 +7,17 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import SkilletApi from '../utils/SkilletApi.cjs';
-import { updateUserOnLogin, setIsFetching } from '../features/user/userSlice';
+import { updateUserOnLogin, setIsFetching, setJustLoggedIn } from '../features/user/userSlice';
 import { useState } from "react";
-import { Navigate, useNavigate, Link } from "react-router-dom";
 import { useDispatch } from 'react-redux';
 
 
 export default function SignUpForm({ handleClose }) {
     const [errorMessage, setErrorMessage] = useState(null);
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     async function handleSubmit(event) {
         event.preventDefault();
-        console.log('testing sign up');
         const data = new FormData(event.currentTarget);
         const skilletApi = new SkilletApi();
         try {
@@ -42,8 +39,8 @@ export default function SignUpForm({ handleClose }) {
                 savedRecipes: [],
             }))
             dispatch(setIsFetching(false));
-            handleClose(); // close modal
-            navigate("/");
+            handleClose(); 
+            dispatch(setJustLoggedIn(true));
 
         } catch (error) {
             setErrorMessage(error.message);

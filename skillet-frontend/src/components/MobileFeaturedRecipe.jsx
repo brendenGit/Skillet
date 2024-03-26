@@ -21,10 +21,6 @@ export default function MobileFeaturedRecipe({ recipeData }) {
         navigateTo(`/recipes/${recipeData.title}`, { state: { recipeData } });
     }
 
-    console.log(user);
-
-    // const isSaved = user.username ? user.savedRecipes.includes(recipeData.id) : false;
-
     function minimizeSummary(str, maxLength) {
         return str.slice(0, maxLength);
     }
@@ -58,7 +54,7 @@ export default function MobileFeaturedRecipe({ recipeData }) {
                         <CardMedia
                             component="img"
                             sx={{ width: '100%', height: 'auto', borderRadius: '5%' }}
-                            image={recipeData.imageUrl}
+                            image={recipeData.image}
                             alt={`Image of ${recipeData.title}`}
                         />
                     </CardActionArea>

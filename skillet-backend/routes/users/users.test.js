@@ -40,7 +40,6 @@ describe("POST /users", function () {
     expect(resp.body).toEqual({
       user: {
         username: "u-new",
-        firstName: "First-new",
         id: expect.any(Number),
         isAdmin: false,
       }, token: expect.any(String),
@@ -63,7 +62,6 @@ describe("POST /users", function () {
     expect(resp.body).toEqual({
       user: {
         username: "u-new",
-        firstName: "First-new",
         id: expect.any(Number),
         isAdmin: true,
       }, token: expect.any(String),

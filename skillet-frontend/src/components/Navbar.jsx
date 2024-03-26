@@ -15,7 +15,7 @@ import Avatar from '@mui/material/Avatar';
 import { updateUserOnLogout, setJustLoggedIn } from '../features/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 
 
@@ -86,7 +86,6 @@ export default function Navbar() {
         loggedIn: [
             { key: 'savedRecipes', label: 'Saved Recipes', path: '/saved-recipes' },
             { key: 'groceryLists', label: 'Grocery Lists', path: '/grocery-lists' },
-            { key: 'account', label: 'Account', path: '/account' },
             { key: 'logout', label: 'Log Out', onClick: handleLogout }
         ]
     };

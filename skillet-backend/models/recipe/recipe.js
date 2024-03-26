@@ -65,7 +65,7 @@ class Recipe {
       RETURNING recipe_id AS "recipeId", rating, save_count AS "saveCount"`,
       [recipeId],
     );
-
+    
     const newStats = res.rows[0];
 
     return newStats;
@@ -90,7 +90,7 @@ class Recipe {
 
     // if no stats are returned create them
     if (res.rows.length === 0) {
-      const newRecipeStats = await this.createStats(recipe.id);
+      const newRecipeStats = await Recipe.createStats(recipe.id);
       return { ...recipe, ...newRecipeStats };
     }
 
@@ -210,7 +210,7 @@ class Recipe {
       throw new BadRequestError(`Error rating recipe with id, ${recipeId}.`)
     }
 
-    const newRating = await this.updateRating(recipeId, rating);
+    const newRating = await Recipe.updateRating(recipeId, rating);
 
     return { recipeId, newRating };
   }
@@ -235,7 +235,7 @@ class Recipe {
 
     if (!savedRecipe) throw new NotFoundError(`Error saving recipe with id, ${recipeId}.`);
 
-    await this.updateCount(recipeId, +1);
+    await Recipe.updateCount(recipeId, +1);
 
     return savedRecipe;
   }
@@ -260,7 +260,7 @@ class Recipe {
 
     if (!removedRecipe) throw new NotFoundError(`Recipe with id, ${recipeId} has not yet been saved`);
 
-    await this.updateCount(recipeId, -1);
+    await Recipe.updateCount(recipeId, -1);
 
     return removedRecipe;
   }

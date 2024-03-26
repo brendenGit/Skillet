@@ -27,7 +27,6 @@ describe("authenticate", function () {
     const user = await User.authenticate("u1", "password1");
     expect(user).toEqual({
       username: "u1",
-      firstName: "U1F",
       id: expect.any(Number),
       isAdmin: false,
     });
@@ -70,7 +69,6 @@ describe("register", function () {
     });
     expect(user).toEqual({
       username: "new",
-      firstName: "Test",
       id: expect.any(Number),
       isAdmin: false,
     });
@@ -88,7 +86,6 @@ describe("register", function () {
     });
     expect(user).toEqual({
       username: "new",
-      firstName: "Test",
       id: expect.any(Number),
       isAdmin: true,
     });

@@ -31,10 +31,10 @@ const userSlice = createSlice({
             return initialState;
         },
         updateRatedRecipes(state, action) {
-            state.ratedRecipes = action.payload.ratedRecipes;
+            state.ratedRecipes = action.payload;
         },
         updateSavedRecipes(state, action) {
-            state.savedRecipes = action.payload.savedRecipes;
+            state.savedRecipes = action.payload;
         }
     }
 })
