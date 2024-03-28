@@ -1,49 +1,41 @@
 "use strict";
 
 /** Shared config for application; can be required many places. */
+
 require("dotenv").config();
 require("colors");
 
-
 const SECRET_KEY = process.env.SECRET_KEY || "secret-dev";
 const PORT = +process.env.PORT || 3001;
-const BCRYPT_WORK_FACTOR = process.env.NODE_ENV === "test" ? 1 : 12; 
-
 
 // Use dev database, testing database, or via env var, production database
 function getDatabaseUri() {
-    //dynamic db vars based on dev mode
-    let dbType;
-    
-    //set dynamic db vars
-    if (process.env.NODE_ENV === "test") {
-        dbType = process.env.DB_TEST_NAME;
-    } else {
-        dbType = process.env.DB_NAME;
-    }
-
-    //return db connection config
+  if (process.env.NODE_ENV === "test") {
     return {
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        host: process.env.DB_HOST,
-        port: parseInt(process.env.DB_PORT, 10),
-        database: dbType,
+      connectionString: process.env.TEST_DATABASE_URL
     };
+  } else {
+    return {
+      connectionString: process.env.DATABASE_URL
+    };
+  };
 };
 
-//log config on db start up 
-console.log("Jobly Config:".green);
+// Speed up bcrypt during tests, since the algorithm safety isn't being tested
+//
+// WJB: Evaluate in 2021 if this should be increased to 13 for non-test use
+const BCRYPT_WORK_FACTOR = process.env.NODE_ENV === "test" ? 1 : 12;
+
+console.log("Skillet Config:".green);
 console.log("SECRET_KEY:".yellow, SECRET_KEY);
 console.log("PORT:".yellow, PORT.toString());
 console.log("BCRYPT_WORK_FACTOR".yellow, BCRYPT_WORK_FACTOR);
 console.log("Database:".yellow, getDatabaseUri());
 console.log("---");
 
-
 module.exports = {
-    SECRET_KEY,
-    PORT,
-    BCRYPT_WORK_FACTOR,
-    getDatabaseUri,
+  SECRET_KEY,
+  PORT,
+  BCRYPT_WORK_FACTOR,
+  getDatabaseUri,
 };

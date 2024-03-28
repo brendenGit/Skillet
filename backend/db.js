@@ -1,14 +1,10 @@
 "use strict";
 
-const { Pool, Client } = require("pg");
-const { getDatabaseUri } = require("./config.js");
-require("dotenv").config();
+/** Database setup for skillet. */
+const { Client } = require("pg");
+const { getDatabaseUri } = require("./config");
 
-const dbConfig = getDatabaseUri();
-const db = process.env.NODE_ENV === "test" 
-        ? new Client(dbConfig)
-        : new Pool(dbConfig);
-
+const db = new Client(getDatabaseUri());
 db.connect();
 
 module.exports = db;
