@@ -162,8 +162,10 @@ class SpoonApi {
                 params: { apiKey: SpoonApi.API_KEY }
             });
             console.debug("Request URL:", url);
-
+            console.debug("making request")
             const resp = await axios.get(url);
+            console.log(resp);
+            console.debug("made request")
             SpoonApi.updateUsage(parseFloat(resp.headers['x-api-quota-used']));
 
             const cleanedData = await SpoonApi.cleanRecipeInfo(resp.data);
@@ -171,7 +173,8 @@ class SpoonApi {
             
             return finalRecipeData;
         } catch (err) {
-            console.error("API Error:", err.response);
+            console.log(err);
+            console.error("API Error:", err);
             let message = err.response.data.error.message;
             throw Array.isArray(message) ? message : [message];
         };
