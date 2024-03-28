@@ -31,7 +31,7 @@ const dietsTypes = ['gluten free', 'ketogenic', 'vegetarian', 'lacto vegetarian'
 
 class SpoonApi {
 
-    static SKILLET_URL = "http://localhost:3001/recipes";
+    static SKILLET_URL = "https://skillet.onrender.com/recipes";
     static RANDOM_SEARCH_URL = "https://api.spoonacular.com/recipes/random";
     static RECIPE_INFO_URL = "https://api.spoonacular.com/recipes";
     static COMPLEX_SEARCH_URL = "https://api.spoonacular.com/recipes/complexSearch";
