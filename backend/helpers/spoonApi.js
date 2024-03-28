@@ -47,7 +47,13 @@ class SpoonApi {
     static async updateUsage(used) {
         console.log(used);
         try {
+            const res = await db.query('SELECT * FROM quota_usage;');
+            console.debug('quota usage selection')
+            console.debug(res);
+            console.log(res);
             const result = await db.query('UPDATE quota_usage SET usage = $1 WHERE id = 1 RETURNING usage;', [used]);
+            console.debug('updated quota usage')
+            console.debug(result)
             dailyRequestCount = result.rows[0].usage;
         } catch (error) {
             console.error(error);
