@@ -99,7 +99,7 @@ class SpoonApi {
             const recipeData = await SpoonApi.getRecipeStats(resp.data.results)
             return recipeData;
         } catch (err) {
-            console.error("API Error:", err.response);
+            console.error("API Error:", err);
             console.error(err);
             let message = err.response.data.error.message;
             throw Array.isArray(message) ? message : [message];
