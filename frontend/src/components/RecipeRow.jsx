@@ -1,11 +1,11 @@
-import { ButtonBase, Typography, Box, CardActionArea } from '@mui/material';
-import { styled, useTheme } from '@mui/material/styles';
-import { useRef, useState } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import RecipeCard from './RecipeCard';
 import { useNavigate } from 'react-router-dom';
+import { ButtonBase, Typography, Box } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+import { useRef } from 'react';
 
 
 const ScrollContainer = styled('div')(({ theme }) => ({

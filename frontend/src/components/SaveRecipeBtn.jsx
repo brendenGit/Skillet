@@ -1,4 +1,3 @@
-import * as React from 'react';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import LoginRequiredModal from './LoginRequiredModal';
@@ -12,11 +11,10 @@ import { useState } from 'react';
 export default function SaveRecipeBtn({ saveCount, isRecipe, recipeId }) {
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user);
-
     const saved = user.username ? user.savedRecipes.includes(recipeId) : false;
     const [isSaved, setIsSaved] = useState(saved);
     const [currSaveCount, setCurrSaveCount] = useState(saveCount);
-
+    
     // state to manage modal if user is not signed in
     const [open, setOpen] = useState(false);
 

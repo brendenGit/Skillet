@@ -9,7 +9,8 @@ export default class SkilletApi {
     }
 
     async request(endpoint, data = {}, method = "get") {
-        console.debug("API Call:", endpoint, data, method);
+        // uncomment for debugging
+        // console.debug("API Call:", endpoint, data, method);
 
         const url = `${BASE_URL}/${endpoint}`;
         const headers = { Authorization: `Bearer ${this.token}` };

@@ -1,6 +1,5 @@
-import React from 'react';
-import { Modal, Box, Typography } from '@mui/material';
 import SignUpForm from './SignUpForm';
+import { Modal, Box } from '@mui/material';
 
 
 const style = {

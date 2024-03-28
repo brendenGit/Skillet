@@ -1,8 +1,8 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import SignUpForm from './SignUpForm';
+import { useState } from 'react';
 
 
 const style = {
@@ -17,7 +17,7 @@ const style = {
 };
 
 export default function SignUpModal() {
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 

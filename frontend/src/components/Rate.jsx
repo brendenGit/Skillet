@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
 import Rating from '@mui/material/Rating';
 import SkilletApi from '../utils/SkilletApi.cjs';
@@ -15,10 +14,8 @@ export default function Rate({ recipeId }) {
   const [open, setOpen] = useState(false);
   const user = useSelector(state => state.user);
   const dispatch = useDispatch();
+  
 
-  let rated;
-
-  console.log(user);
   useEffect(() => {
     if (user.username) {
       const rated = user.ratedRecipes.find(recipe => recipe.id === recipeId);

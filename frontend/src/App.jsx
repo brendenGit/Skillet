@@ -1,4 +1,3 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Search from './pages/Search';
@@ -6,6 +5,7 @@ import Recipe from './pages/Recipe';
 import SavedRecipes from './pages/SavedRecipes';
 import GroceryLists from './pages/GroceryLists';
 import { useSelector } from 'react-redux';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 
 function App() {

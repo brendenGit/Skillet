@@ -1,4 +1,3 @@
-import * as React from 'react';
 import BubbleSection from '../components/BubbleSection';
 import SkilletApi from '../utils/SkilletApi.cjs';
 import FeaturedRecipe from '../components/FeaturedRecipe';
