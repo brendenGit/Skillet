@@ -11,7 +11,6 @@ const { BadRequestError } = require("../../expressError.js");
 const Recipe = require("../../models/recipe/recipe.js");
 const SpoonApi = require("../../helpers/spoonApi.js");
 const router = express.Router();
-const FEATURED_RECIPE_ID = process.env.FEATURED_RECIPE_ID;
 
 
 /** GET gets all saved recipes savedRecipes => { savedRecipes: [recipeId, recipeId, ...] }
@@ -62,7 +61,7 @@ router.get("/search", async function (req, res, next) {
 
 router.get("/featured", async function (req, res, next) {
   try {
-    const featuredRecipe = await SpoonApi.getRecipeInfo(FEATURED_RECIPE_ID);
+    const featuredRecipe = await SpoonApi.getRecipeInfo(633063);
     if (featuredRecipe.overQuota) {
       return res.status(429).json({ message: 'Daily quota limit reached. Please try again tomorrow.' });
     }
