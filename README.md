@@ -59,7 +59,7 @@ Contributions are welcome! Please feel free to submit a pull request.
 - Mobile app built with React Native.
 
 ## Goal
-- To provide users with an application for finding, saving, and organizing food/drink recipes. Additionally, the app will generate grocery lists based on saved recipes, simplifying the shopping process.
+- To provide users with an application for finding, saving, and organizing food/drink recipes.
 
 ## Target Users
 - Consumer audience, individuals seeking recipe organization and grocery planning solutions.
@@ -82,13 +82,11 @@ Contributions are welcome! Please feel free to submit a pull request.
   - Account creation for application access.
   - Recipe management: viewing, saving, uploading.
   - Cooking mode: guided step-by-step instructions.
-  - Grocery list creation and management.
 - **User Flow**:
   1. Download application.
   2. Create an account.
   3. Browse and save recipes.
-  4. Create and manage grocery lists.
-  5. Cook recipes.
+  4. Cook recipes.
 - **Beyond CRUD**:
   - Entirely mobile app using React Native.
   - Potential integration with Vision Pro for enhanced accessibility features.
