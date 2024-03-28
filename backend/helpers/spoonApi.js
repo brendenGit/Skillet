@@ -224,9 +224,13 @@ class SpoonApi {
     /** get recipe stats */
     static async getRecipeStats(recipes) {
         try {
+            console.log('getting recipe stats')
+            console.log(recipes);
             const resp = await axios.post(`${SpoonApi.SKILLET_URL}/stats`, { recipes: recipes });
+            console.log(resp)
             return resp.data;
         } catch (err) {
+            console.log(err)
             console.error("API Error:", err.response);
             let message = err.response.data.error.message;
             throw Array.isArray(message) ? message : [message];
