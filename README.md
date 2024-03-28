@@ -88,5 +88,5 @@ Contributions are welcome! Please feel free to submit a pull request.
   3. Browse and save recipes.
   4. Cook recipes.
 - **Beyond CRUD**:
-  - Entirely mobile app using React Native.
+  - Entirely mobile app using React and Material UI For responsive design.
   - Potential integration with Vision Pro for enhanced accessibility features.
