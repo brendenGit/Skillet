@@ -90,17 +90,17 @@ class SpoonApi {
                 params: { apiKey: SpoonApi.API_KEY, ...params }
             });
             console.debug("Request URL:", url);
-
+            console.debug("making request")
             const resp = await axios.get(url)
-            console.log(resp);
-            console.debug(resp);
+            console.debug('request made');
             SpoonApi.updateUsage(parseFloat(resp.headers['x-api-quota-used']));
 
             const recipeData = await SpoonApi.getRecipeStats(resp.data.results)
             return recipeData;
         } catch (err) {
+            console.debug(err);
+            console.log(err);
             console.error("API Error:", err);
-            console.error(err);
             let message = err.response.data.error.message;
             throw Array.isArray(message) ? message : [message];
         };
