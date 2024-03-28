@@ -55,6 +55,7 @@ class SpoonApi {
             console.debug('updated quota usage')
             console.debug(result)
             dailyRequestCount = result.rows[0].usage;
+            console.log(dailyRequestCount);
         } catch (error) {
             console.error(error);
         };
@@ -177,10 +178,14 @@ class SpoonApi {
             const resp = await axios.get(url);
             console.log(resp);
             console.debug("made request")
-            SpoonApi.updateUsage(parseFloat(resp.headers['x-api-quota-used']));
+            await SpoonApi.updateUsage(parseFloat(resp.headers['x-api-quota-used']));
 
             const cleanedData = await SpoonApi.cleanRecipeInfo(resp.data);
+            console.log('cleaned data')
+            console.log(cleanedData)
             const finalRecipeData = await SpoonApi.getRecipeStats([cleanedData]);
+            console.log('finalRecipeData')
+            console.log(finalRecipeData)
 
             return finalRecipeData;
         } catch (err) {
