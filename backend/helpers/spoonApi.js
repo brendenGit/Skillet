@@ -45,9 +45,14 @@ class SpoonApi {
     }
 
     static async updateUsage(used) {
-        const result = await db.query('UPDATE quota_usage SET usage = $1 WHERE id = 1 RETURNING usage;', [used]);
-        dailyRequestCount = result.rows[0].usage;
-    }
+        console.log(used);
+        try {
+            const result = await db.query('UPDATE quota_usage SET usage = $1 WHERE id = 1 RETURNING usage;', [used]);
+            dailyRequestCount = result.rows[0].usage;
+        } catch (error) {
+            console.error(error);
+        };
+    };
 
     /** makes call to spoon api to get data on multiple recipes
      * 
@@ -170,7 +175,7 @@ class SpoonApi {
 
             const cleanedData = await SpoonApi.cleanRecipeInfo(resp.data);
             const finalRecipeData = await SpoonApi.getRecipeStats([cleanedData]);
-            
+
             return finalRecipeData;
         } catch (err) {
             console.log(err);
