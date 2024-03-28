@@ -92,12 +92,15 @@ class SpoonApi {
             console.debug("Request URL:", url);
 
             const resp = await axios.get(url)
+            console.log(resp);
+            console.debug(resp);
             SpoonApi.updateUsage(parseFloat(resp.headers['x-api-quota-used']));
 
             const recipeData = await SpoonApi.getRecipeStats(resp.data.results)
             return recipeData;
         } catch (err) {
             console.error("API Error:", err.response);
+            console.error(err);
             let message = err.response.data.error.message;
             throw Array.isArray(message) ? message : [message];
         };
