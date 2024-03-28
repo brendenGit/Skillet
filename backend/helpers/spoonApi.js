@@ -45,17 +45,9 @@ class SpoonApi {
     }
 
     static async updateUsage(used) {
-        console.log(used);
         try {
-            const res = await db.query('SELECT * FROM quota_usage;');
-            console.debug('quota usage selection')
-            console.debug(res);
-            console.log(res);
             const result = await db.query('UPDATE quota_usage SET usage = $1 WHERE id = 1 RETURNING usage;', [used]);
-            console.debug('updated quota usage')
-            console.debug(result)
             dailyRequestCount = result.rows[0].usage;
-            console.log(dailyRequestCount);
         } catch (error) {
             console.error(error);
         };
@@ -102,16 +94,13 @@ class SpoonApi {
                 params: { apiKey: SpoonApi.API_KEY, ...params }
             });
             console.debug("Request URL:", url);
-            console.debug("making request")
             const resp = await axios.get(url)
-            console.debug('request made');
-            SpoonApi.updateUsage(parseFloat(resp.headers['x-api-quota-used']));
+
+            await SpoonApi.updateUsage(parseFloat(resp.headers['x-api-quota-used']));
 
             const recipeData = await SpoonApi.getRecipeStats(resp.data.results)
             return recipeData;
         } catch (err) {
-            console.debug(err);
-            console.log(err);
             console.error("API Error:", err);
             let message = err.response.data.error.message;
             throw Array.isArray(message) ? message : [message];
@@ -150,7 +139,7 @@ class SpoonApi {
             console.debug("Request URL:", url);
 
             const resp = await axios.get(url);
-            SpoonApi.updateUsage(parseFloat(resp.headers['x-api-quota-used']));
+            await SpoonApi.updateUsage(parseFloat(resp.headers['x-api-quota-used']));
 
             const recipeData = await SpoonApi.getRecipeStats(resp.data.recipes)
             return recipeData;
@@ -174,22 +163,15 @@ class SpoonApi {
                 params: { apiKey: SpoonApi.API_KEY }
             });
             console.debug("Request URL:", url);
-            console.debug("making request")
             const resp = await axios.get(url);
-            console.log(resp);
-            console.debug("made request")
+
             await SpoonApi.updateUsage(parseFloat(resp.headers['x-api-quota-used']));
 
             const cleanedData = await SpoonApi.cleanRecipeInfo(resp.data);
-            console.log('cleaned data')
-            console.log(cleanedData)
             const finalRecipeData = await SpoonApi.getRecipeStats([cleanedData]);
-            console.log('finalRecipeData')
-            console.log(finalRecipeData)
 
             return finalRecipeData;
         } catch (err) {
-            console.log(err);
             console.error("API Error:", err);
             let message = err.response.data.error.message;
             throw Array.isArray(message) ? message : [message];
@@ -224,13 +206,9 @@ class SpoonApi {
     /** get recipe stats */
     static async getRecipeStats(recipes) {
         try {
-            console.log('getting recipe stats')
-            console.log(recipes);
             const resp = await axios.post(`${SpoonApi.SKILLET_URL}/stats`, { recipes: recipes });
-            console.log(resp)
             return resp.data;
         } catch (err) {
-            console.log(err)
             console.error("API Error:", err.response);
             let message = err.response.data.error.message;
             throw Array.isArray(message) ? message : [message];
