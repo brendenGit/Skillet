@@ -51,8 +51,10 @@ Skillet is a full-stack application that allows users to explore, save, and rate
 Contributions are welcome! Please feel free to submit a pull request.
 
 ## Tech Stack
-- **Frontend**: React.js , React Native
-- **Backend**: Node.js, Express.js , might also incorporate MongoDB
+- **Frontend**: React.js, Material UI
+- **Backend**: Node.js, Express.js
+- **Database**: hosted on ElephantSQL
+- **Services**: hosted on Render
 
 ## Focus
 - The project will have a slightly heavier focus on frontend development as it targets B2C interactions. However, backend development will also be given significant attention for a well-rounded application.
