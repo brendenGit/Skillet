@@ -1,5 +1,5 @@
 # Skillet
-
+Skillet is live [here](https://skillet-1.onrender.com/) but keep in mind availability is limited until we run out of requests for the day from [Spoonacular](https://spoonacular.com/food-api). I'm on a small tier they offer!
 ## Overview
 Skillet is a full-stack application that allows users to explore, save, and rate recipes. The backend is built with Node.js and Express, while the frontend is powered by Vite.
 
