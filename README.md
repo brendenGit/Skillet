@@ -50,6 +50,9 @@ Skillet is a full-stack application that allows users to explore, save, and rate
 ## Contributing
 Contributions are welcome! Please feel free to submit a pull request.
 
+## Figma Design Files
+Check them out [here](https://www.figma.com/file/jLqVWgjKTOSwGB4hq8QC9f/skillet?type=design&node-id=0%3A1&mode=design&t=Ap6BHmcH75mwnshb-1)
+
 ## Tech Stack
 - **Frontend**: React.js, Material UI
 - **Backend**: Node.js, Express.js
